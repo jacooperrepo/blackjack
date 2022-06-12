@@ -4,6 +4,7 @@ from Pack.deck import Shoe
 
 class Blackjack():
     _player_hand_end = False
+    _player_hand_split = False
 
     def __init__(self, shoe_size:int = 1):
         self.shoe_size = shoe_size
@@ -27,7 +28,13 @@ class Blackjack():
             output += '  '
         output += Fore.LIGHTBLACK_EX + 'Player ' + Style.RESET_ALL
 
-        output += ' '.join(str(card) for card in self.player_hand)
+        if self._player_hand_split:
+            output += ' '.join(str(card) for card in self.player_hand[0])
+            output += '|'
+            output += ' '.join(str(card) for card in self.player_hand[1])
+        else:
+            output += ' '.join(str(card) for card in self.player_hand)
+
         output += Fore.GREEN + Style.BRIGHT + '\n---------------------------------------------\n' + Style.RESET_ALL
         output += 'remaining cards: {}'.format(self.shoe.remaining())
         output += '\n'
@@ -45,7 +52,7 @@ class Blackjack():
                 while entry.upper() != 'Q':
                     self.render_game_board()
                     entry = input('H to Hit S to Stand F to Fold | C Check Winner \n'
-                                  'R to Reset Deck\n\n\n\n')
+                                  'R to Reset Deck X to Split\n\n\n\n')
 
                     if entry.upper() == 'H':
                         if not self._player_hand_end:
@@ -70,7 +77,11 @@ class Blackjack():
                         break
                     elif entry.upper() == 'R':
                         self.shoe = Shoe(self.shoe_size)
-                        continue
+                    elif entry.upper() == 'X':
+                        if len(self.player_hand) == 2 and self.player_hand[1].value == self.player_hand[0].value:
+                            self.player_hand[0] = [self.player_hand[0], self.shoe.deal()]
+                            self.player_hand[1] = [self.player_hand[1], self.shoe.deal()]
+                            self._player_hand_split = True
 
                 keep_playing = input('Play another hand? Y or N ')
                 self.reset_hands()
@@ -93,6 +104,7 @@ class Blackjack():
         self.player_hand = []
         self.dealer_hand = []
         self._player_hand_end = False
+        self._player_hand_split = False
 
     def check_winner(self) -> None:
         player_total = 0
