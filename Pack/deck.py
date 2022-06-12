@@ -6,7 +6,7 @@ from Pack.card_attributes import CardSuit, CardValue
 
 class Card():
     """Generic card"""
-    def __init__(self, value: CardValue, suit: CardSuit):
+    def __init__(self, value, suit):
         self.suit = suit
         self.value = value
 
@@ -34,7 +34,7 @@ class Joker(Card):
 
 class Diamonds(Card):
     """Diamonds suit card"""
-    def __init__(self, value: CardValue):
+    def __init__(self, value):
         super().__init__(value, CardSuit.Diamonds)
 
     def __str__(self):
@@ -43,7 +43,7 @@ class Diamonds(Card):
 
 class Hearts(Card):
     """Hearts suit card"""
-    def __init__(self, value: CardValue):
+    def __init__(self, value):
         super().__init__(value, CardSuit.Hearts)
 
     def __str__(self):
@@ -52,7 +52,7 @@ class Hearts(Card):
 
 class Clubs(Card):
     """Clubs suit card"""
-    def __init__(self, value: CardValue):
+    def __init__(self, value):
         super().__init__(value, CardSuit.Clubs)
 
     def __str__(self):
@@ -61,7 +61,7 @@ class Clubs(Card):
 
 class Spades(Card):
     """Spades suit card"""
-    def __init__(self, value: CardValue):
+    def __init__(self, value):
         super().__init__(value, CardSuit.Spades)
 
     def __str__(self):

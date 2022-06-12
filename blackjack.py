@@ -15,7 +15,7 @@ class Blackjack():
         self.dealer_hand = []
 
     def __str__(self):
-        output = ''
+        output = '\n'*50
         output += Fore.GREEN + Style.BRIGHT + '------------------Blackjack------------------\n' \
                   + Style.RESET_ALL
         if self._player_hand_end:
@@ -66,7 +66,7 @@ class Blackjack():
         entry = ''
 
         while entry.upper() != 'Q':
-            self.render_game_board()
+            print(self)
             entry = input('H to Hit S to Stand F to Fold | C Check Winner \n'
                           'R to Reset Deck X to Split\n\n\n\n')
 
@@ -74,14 +74,14 @@ class Blackjack():
                 if not self._player_hand_end:
                     self.player_hand.append(self.shoe.deal())
                     if self.check_bust(self.player_hand):
-                        self.render_game_board()
+                        print(self)
                         print(Fore.RED + Style.BRIGHT + 'Player BUST! Dealer Wins!\n\n\n\n\n' \
                               + Style.RESET_ALL)
                         break
                 else:
                     self.dealer_hand.append(self.shoe.deal())
                     if self.check_bust(self.dealer_hand):
-                        self.render_game_board()
+                        print(self)
                         print(Fore.GREEN + Style.BRIGHT + 'Dealer BUST! Player Wins!\n\n\n\n\n' \
                               + Style.RESET_ALL)
                         break
@@ -157,11 +157,6 @@ class Blackjack():
             print(Fore.BLUE + Style.BRIGHT + 'Dealer wins!' + Style.RESET_ALL)
         else:
             print(Fore.BLACK + Style.BRIGHT + 'No winner' + Style.RESET_ALL)
-
-    def render_game_board(self) -> None:
-        """Draw the blackjack game board"""
-        print('\n'*50)
-        print(self)
 
 
 if __name__ == "__main__":
