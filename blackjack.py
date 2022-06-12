@@ -49,7 +49,7 @@ class Blackjack():
                             self.dealer.append(self.shoe.deal())
                             if self.check_bust(self.dealer):
                                 self.render_game_board()
-                                print(Fore.RED + Style.BRIGHT + 'Dealer BUST! Player Wins!\n\n\n\n\n' + Style.RESET_ALL)
+                                print(Fore.GREEN + Style.BRIGHT + 'Dealer BUST! Player Wins!\n\n\n\n\n' + Style.RESET_ALL)
                                 break
                     elif entry.upper() == 'S':
                         player_hand_end = True
