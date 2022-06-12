@@ -63,35 +63,40 @@ class Spades(Card):
     """Spades suit card"""
     def __init__(self, value: CardValue):
         super().__init__(value, CardSuit.Spades)
+
     def __str__(self):
         return  f"{Fore.BLACK + Style.BRIGHT}♠{self.value.value}" + Style.RESET_ALL
 
 
 class Deck():
     """Playing deck of cards"""
-    def __init__(self, with_joker: bool = False):
+    def __init__(self, with_joker: bool = False, and_shuffle: bool = False):
         self.cards = self.generate_deck(with_joker)
+        if and_shuffle:
+            self.shuffle()
 
-    def shuffle(self):
+    def shuffle(self) -> None:
         """Shuffle the deck"""
         shuffle(self.cards)
 
-    def deal(self):
+    def deal(self) -> Card:
         """Deal one card from deck"""
         return self.cards.pop()
 
-    def add(self, card: Card):
+    def add(self, card: Card) -> None:
         """Add a card to the deck"""
         self.cards.append(card)
 
-    def remove(self, card: Card):
+    def remove(self, card: Card) -> None:
         """Remove a card from the deck"""
         for remove_card in filter(lambda target: target.value == card.value and target.suit == card.suit, self.cards):
             self.cards.remove(remove_card)
 
-    def reset(self, with_joker: bool = False):
+    def reset(self, with_joker: bool = False, and_shuffle: bool = False) -> None:
         """Regenerate the deck of cards"""
         self.cards = self.generate_deck(with_joker)
+        if and_shuffle:
+            self.shuffle()
 
     @staticmethod
     def generate_deck(with_joker: bool) -> list:
@@ -108,3 +113,37 @@ class Deck():
             deck.append(Joker())
 
         return deck
+
+
+class Shoe():
+    """A shoe containing multiple decks"""
+
+    def __init__(self, size:int = 1):
+        self.cards = []
+        self.size = size
+        self.generate_shoe()
+
+    def generate_shoe(self):
+        """Generate new shoe with specified number of decks"""
+        shoe = []
+
+        for _ in range(0, self.size):
+            for card in Deck().cards:
+                shoe.append(card)
+
+        shuffle(shoe)
+        self.cards = shoe
+
+    def deal(self) -> Card:
+        """Deal one card from the shoe"""
+        return self.cards.pop()
+
+    def remaining(self) -> int:
+        """Return remaining cards in shoe"""
+        return len(self.cards)
+
+    def reset(self, size: int = 1):
+        """Reset shoe to desired deck count"""
+        self.size = size
+        self.generate_shoe()
+

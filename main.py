@@ -1,34 +1,42 @@
 # Testing deck
-from Pack.deck import Deck, Diamonds, Joker, Spades
+from Pack.deck import Deck, Diamonds, Joker, Spades, Hearts, Clubs, Shoe, Card
 from Pack.card_attributes import CardSuit, CardValue
 
 if __name__ == '__main__':
 
-    deck = Deck(True)
-    deck.shuffle()
+    """Find a Royal Flush"""
 
-    deck.deal()
-    deck.deal()
+    shoe = Shoe(1000000)
+    hand_count = 0
 
-    print(''.join(str(card) for card in deck.cards))
+    while shoe.remaining() >= 5:
+        card = shoe.deal()
+        suit = card.suit
+        hand = [card, shoe.deal(), shoe.deal(), shoe.deal(), shoe.deal()]
+        hand_count += 1
 
-    deck.reset()
+        hand_filter = filter(lambda target: target.suit == card.suit, hand)
+        hand_filter_list = list(hand_filter)
 
-    print(''.join(str(card) for card in deck.cards))
+        if len(hand_filter_list) == 5:
+            found_ten = False
+            found_jack = False
+            found_queen = False
+            found_king = False
+            found_ace = False
 
-    diamond = Diamonds(CardValue.King)
-    deck.add(diamond)
+            for item in hand_filter_list:
+                if item.value == CardValue.Ten:
+                    found_ten = True
+                elif item.value == CardValue.Jack:
+                    found_jack = True
+                elif item.value == CardValue.Queen:
+                    found_queen = True
+                elif item.value == CardValue.King:
+                    found_king = True
+                elif item.value == CardValue.Ace:
+                    found_ace = True
 
-    deck.remove(Spades(CardValue.Ace))
-    deck.remove(Spades(CardValue.Two))
-    deck.remove(Spades(CardValue.Three))
-    deck.remove(Spades(CardValue.Queen))
-
-   # deck.remove(Diamonds(CardValue.Ace))
-   # deck.remove(Diamonds(CardValue.Queen))
-
-    print(''.join(str(card) for card in deck.cards))
-
-    print('test')
-
-    print(diamond.numerical_value())
+            if found_ten and found_jack and found_queen and found_king and found_ace:
+                print('Royal Flush on hand {}'.format(hand_count))
+                print(' '.join(str(item) for item in hand))

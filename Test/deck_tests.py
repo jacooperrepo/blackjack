@@ -1,6 +1,11 @@
 """Testing the deck of cards"""
 import pytest
-from Pack.deck import Deck, Joker, Diamonds, Spades, Clubs, Hearts, CardValue, CardSuit
+from Pack.deck import Shoe, Deck, Joker, Diamonds, Spades, Clubs, Hearts, CardValue, CardSuit
+
+
+@pytest.fixture
+def shoe():
+    return Shoe(2)
 
 
 @pytest.fixture
@@ -123,3 +128,25 @@ def test_remove_card_from_deck(player_deck):
 
     assert len(found_cards_list) == 0
     assert len(player_deck.cards) == 51
+
+
+def test_shoe_creation(shoe):
+    assert len(shoe.cards) == 104
+
+
+def test_shoe_remaining(shoe):
+    assert shoe.remaining() == 104
+
+
+def test_shoe_deal(shoe):
+
+    shoe.deal()
+    assert shoe.remaining() == 103
+
+
+def test_shoe_reset():
+    shoe = Shoe(2)
+    assert shoe.remaining() == 104
+
+    shoe.reset(3)
+    assert len(shoe.cards) == 156
