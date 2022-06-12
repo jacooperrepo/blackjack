@@ -56,7 +56,7 @@ class Clubs(Card):
         super().__init__(value, CardSuit.Clubs)
 
     def __str__(self):
-        return  f"{Fore.BLACK + Style.BRIGHT}♣️{self.value.value}" + Style.RESET_ALL
+        return  f"{Fore.BLACK + Style.BRIGHT}♣︎{self.value.value}" + Style.RESET_ALL
 
 
 class Spades(Card):
