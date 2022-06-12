@@ -1,6 +1,13 @@
 """Blackjack card game"""
+from enum import Enum
 from colorama import Fore, Style
 from Pack.deck import Shoe
+
+
+class GameWinner():
+    Player: str = "Player"
+    Dealer: str = "Dealer"
+    Draw: str = "Draw"
 
 
 class Blackjack():
@@ -88,7 +95,13 @@ class Blackjack():
             elif entry.upper() == 'S':
                 self._player_hand_end = True
             elif entry.upper() == 'C':
-                self.check_winner()
+                result = self.check_winner()
+                if result == GameWinner.Player:
+                    print(Fore.GREEN + Style.BRIGHT + 'Player wins!' + Style.RESET_ALL)
+                elif result == GameWinner.Dealer:
+                    print(Fore.BLUE + Style.BRIGHT + 'Dealer wins!' + Style.RESET_ALL)
+                else:
+                    print(Fore.BLACK + Style.BRIGHT + 'No winner' + Style.RESET_ALL)
                 break
             elif entry.upper() == 'F':
                 print(Fore.BLUE + Style.BRIGHT + 'Dealer wins!' + Style.RESET_ALL)
@@ -116,17 +129,18 @@ class Blackjack():
 
     def reset_hands(self) -> None:
         """Reset hands to starting state"""
-        self.player_hand = []
-        self.dealer_hand = []
+        self.player_hand.clear()
+        self.dealer_hand.clear()
         self._player_hand_end = False
         self._player_hand_split = False
 
-    def check_winner(self) -> None:
+    def check_winner(self) -> str:
         """Check if player or dealer is the winner"""
         player_total = 0
         player_has_ace = False
         dealer_total = 0
         dealer_has_ace = False
+        result = GameWinner.Draw
 
         for card in self.player_hand:
             card_value = card.numerical_value()
@@ -152,11 +166,11 @@ class Blackjack():
         dealer_bust = dealer_total > 21
 
         if player_total > dealer_total and not player_bust:
-            print(Fore.GREEN + Style.BRIGHT + 'Player wins!' + Style.RESET_ALL)
+            result = GameWinner.Player
         elif dealer_total > player_total and not dealer_bust:
-            print(Fore.BLUE + Style.BRIGHT + 'Dealer wins!' + Style.RESET_ALL)
-        else:
-            print(Fore.BLACK + Style.BRIGHT + 'No winner' + Style.RESET_ALL)
+            result = GameWinner.Dealer
+
+        return result
 
 
 if __name__ == "__main__":
