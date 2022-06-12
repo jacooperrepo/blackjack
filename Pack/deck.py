@@ -1,6 +1,6 @@
 """Playing deck and cards"""
 from random import shuffle
-from colorama import Fore, Style, init
+from colorama import Fore, Style
 from Pack.card_attributes import CardSuit, CardValue
 
 
