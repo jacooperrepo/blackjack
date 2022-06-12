@@ -1,8 +1,10 @@
+"""Blackjack card game"""
 from colorama import Fore, Style
 from Pack.deck import Shoe
 
 
 class Blackjack():
+    """Blackjack game class"""
     _player_hand_end = False
     _player_hand_split = False
 
@@ -14,7 +16,8 @@ class Blackjack():
 
     def __str__(self):
         output = ''
-        output += Fore.GREEN + Style.BRIGHT + '------------------Blackjack------------------\n' + Style.RESET_ALL
+        output += Fore.GREEN + Style.BRIGHT + '------------------Blackjack------------------\n' \
+                  + Style.RESET_ALL
         if self._player_hand_end:
             output += Fore.BLACK + Style.BRIGHT + '* '
         else:
@@ -35,62 +38,73 @@ class Blackjack():
         else:
             output += ' '.join(str(card) for card in self.player_hand)
 
-        output += Fore.GREEN + Style.BRIGHT + '\n---------------------------------------------\n' + Style.RESET_ALL
+        output += Fore.GREEN + Style.BRIGHT + '\n---------------------------------------------\n' \
+                  + Style.RESET_ALL
         output += 'remaining cards: {}'.format(self.shoe.remaining())
         output += '\n'
         return output
 
     def play(self) -> None:
+        """Game logic to run the game"""
         keep_playing = 'Y'
 
         try:
             while keep_playing.upper() == 'Y':
-                entry = ''
                 self.dealer_hand.append(self.shoe.deal())
                 self.player_hand.append(self.shoe.deal())
 
-                while entry.upper() != 'Q':
-                    self.render_game_board()
-                    entry = input('H to Hit S to Stand F to Fold | C Check Winner \n'
-                                  'R to Reset Deck X to Split\n\n\n\n')
-
-                    if entry.upper() == 'H':
-                        if not self._player_hand_end:
-                            self.player_hand.append(self.shoe.deal())
-                            if self.check_bust(self.player_hand):
-                                self.render_game_board()
-                                print(Fore.RED + Style.BRIGHT + 'Player BUST! Dealer Wins!\n\n\n\n\n' + Style.RESET_ALL)
-                                break
-                        else:
-                            self.dealer_hand.append(self.shoe.deal())
-                            if self.check_bust(self.dealer_hand):
-                                self.render_game_board()
-                                print(Fore.GREEN + Style.BRIGHT + 'Dealer BUST! Player Wins!\n\n\n\n\n' + Style.RESET_ALL)
-                                break
-                    elif entry.upper() == 'S':
-                        self._player_hand_end = True
-                    elif entry.upper() == 'C':
-                        self.check_winner()
-                        break
-                    elif entry.upper() == 'F':
-                        print(Fore.BLUE + Style.BRIGHT + 'Dealer wins!' + Style.RESET_ALL)
-                        break
-                    elif entry.upper() == 'R':
-                        self.shoe = Shoe(self.shoe_size)
-                    elif entry.upper() == 'X':
-                        if len(self.player_hand) == 2 and self.player_hand[1].value == self.player_hand[0].value:
-                            self.player_hand[0] = [self.player_hand[0], self.shoe.deal()]
-                            self.player_hand[1] = [self.player_hand[1], self.shoe.deal()]
-                            self._player_hand_split = True
+                self.process_input()
 
                 keep_playing = input('Play another hand? Y or N ')
+
                 self.reset_hands()
         except IndexError:
             print(Fore.RED + Style.BRIGHT + 'Out of cards' + Style.RESET_ALL)
 
+    def process_input(self) -> None:
+        """Process player input"""
+        entry = ''
+
+        while entry.upper() != 'Q':
+            self.render_game_board()
+            entry = input('H to Hit S to Stand F to Fold | C Check Winner \n'
+                          'R to Reset Deck X to Split\n\n\n\n')
+
+            if entry.upper() == 'H':
+                if not self._player_hand_end:
+                    self.player_hand.append(self.shoe.deal())
+                    if self.check_bust(self.player_hand):
+                        self.render_game_board()
+                        print(Fore.RED + Style.BRIGHT + 'Player BUST! Dealer Wins!\n\n\n\n\n' \
+                              + Style.RESET_ALL)
+                        break
+                else:
+                    self.dealer_hand.append(self.shoe.deal())
+                    if self.check_bust(self.dealer_hand):
+                        self.render_game_board()
+                        print(Fore.GREEN + Style.BRIGHT + 'Dealer BUST! Player Wins!\n\n\n\n\n' \
+                              + Style.RESET_ALL)
+                        break
+            elif entry.upper() == 'S':
+                self._player_hand_end = True
+            elif entry.upper() == 'C':
+                self.check_winner()
+                break
+            elif entry.upper() == 'F':
+                print(Fore.BLUE + Style.BRIGHT + 'Dealer wins!' + Style.RESET_ALL)
+                break
+            elif entry.upper() == 'R':
+                self.shoe = Shoe(self.shoe_size)
+            elif entry.upper() == 'X':
+                if len(self.player_hand) == 2 and \
+                        self.player_hand[1].value == self.player_hand[0].value:
+                    self.player_hand[0] = [self.player_hand[0], self.shoe.deal()]
+                    self.player_hand[1] = [self.player_hand[1], self.shoe.deal()]
+                    self._player_hand_split = True
 
     @staticmethod
     def check_bust(cards: list) -> bool:
+        """Check if hand is over 21"""
         total = 0
         for card in cards:
             total += card.numerical_value()
@@ -100,13 +114,15 @@ class Blackjack():
 
         return False
 
-    def reset_hands(self):
+    def reset_hands(self) -> None:
+        """Reset hands to starting state"""
         self.player_hand = []
         self.dealer_hand = []
         self._player_hand_end = False
         self._player_hand_split = False
 
     def check_winner(self) -> None:
+        """Check if player or dealer is the winner"""
         player_total = 0
         player_has_ace = False
         dealer_total = 0
@@ -143,13 +159,12 @@ class Blackjack():
             print(Fore.BLACK + Style.BRIGHT + 'No winner' + Style.RESET_ALL)
 
     def render_game_board(self) -> None:
+        """Draw the blackjack game board"""
         print('\n'*50)
         print(self)
 
 
 if __name__ == "__main__":
 
-    game = Blackjack(1)
+    game = Blackjack(5)
     game.play()
-
-
