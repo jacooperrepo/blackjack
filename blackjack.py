@@ -75,26 +75,27 @@ class Blackjack():
         while entry.upper() != 'Q':
             print(self)
             entry = input('H to Hit S to Stand F to Fold | C Check Winner \n'
-                          'R to Reset Deck X to Split\n\n\n\n')
+                          'R to Reset Deck X to Split ')
 
             if entry.upper() == 'H':
                 if not self._player_hand_end:
                     self.player_hand.append(self.shoe.deal())
                     if self.check_bust(self.player_hand):
                         print(self)
-                        print(Fore.RED + Style.BRIGHT + 'Player BUST! Dealer Wins!\n\n\n\n\n' \
+                        print(Fore.RED + Style.BRIGHT + 'Player BUST! Dealer Wins!' \
                               + Style.RESET_ALL)
                         break
                 else:
                     self.dealer_hand.append(self.shoe.deal())
                     if self.check_bust(self.dealer_hand):
                         print(self)
-                        print(Fore.GREEN + Style.BRIGHT + 'Dealer BUST! Player Wins!\n\n\n\n\n' \
+                        print(Fore.GREEN + Style.BRIGHT + 'Dealer BUST! Player Wins!' \
                               + Style.RESET_ALL)
                         break
             elif entry.upper() == 'S':
                 self._player_hand_end = True
             elif entry.upper() == 'C':
+                print(self)
                 result = self.check_winner()
                 if result == GameWinner.Player:
                     print(Fore.GREEN + Style.BRIGHT + 'Player wins!' + Style.RESET_ALL)

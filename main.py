@@ -6,7 +6,7 @@ if __name__ == '__main__':
 
     """Find a Royal Flush"""
 
-    shoe = Shoe(1)
+    shoe = Shoe(100000)
     hand_count = 0
 
     while shoe.remaining() >= 5:
@@ -40,6 +40,4 @@ if __name__ == '__main__':
             if found_ten and found_jack and found_queen and found_king and found_ace:
                 print('Royal Flush on hand {}'.format(hand_count))
                 print(' '.join(str(item) for item in hand))
-            else:
-                print('Flush on hand {}'.format(hand_count))
-                print(' '.join(str(item) for item in hand))
+
