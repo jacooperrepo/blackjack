@@ -68,12 +68,9 @@ class Spades(Card):
         return  f"{Fore.BLACK + Style.BRIGHT}♠{self.value.value}" + Style.RESET_ALL
 
 
-class Deck():
-    """Playing deck of cards"""
-    def __init__(self, with_joker: bool = False, and_shuffle: bool = False):
-        self.cards = self.generate_deck(with_joker)
-        if and_shuffle:
-            self.shuffle()
+class CardCollection:
+    def __init__(self, cards:[]):
+        self.cards = cards
 
     def shuffle(self) -> None:
         """Shuffle the deck"""
@@ -91,6 +88,25 @@ class Deck():
         """Remove a card from the deck"""
         for remove_card in filter(lambda target: target.value == card.value and target.suit == card.suit, self.cards):
             self.cards.remove(remove_card)
+
+    def total(self) -> int:
+        total = 0
+        for card in self.cards:
+            total += card.numerical_value()
+        return total
+
+    def reset(self) -> None:
+        """Regenerate the deck of cards"""
+        self.cards = []
+
+
+class Deck(CardCollection):
+    """Playing deck of cards"""
+    def __init__(self, with_joker: bool = False, and_shuffle: bool = False):
+        super().__init__(self.generate_deck(with_joker))
+
+        if and_shuffle:
+            self.shuffle()
 
     def reset(self, with_joker: bool = False, and_shuffle: bool = False) -> None:
         """Regenerate the deck of cards"""
