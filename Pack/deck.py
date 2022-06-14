@@ -4,7 +4,7 @@ from colorama import Fore, Style
 from Pack.card_attributes import CardSuit, CardValue
 
 
-class Card():
+class Card:
     """Generic card"""
     def __init__(self, value, suit):
         self.suit = suit

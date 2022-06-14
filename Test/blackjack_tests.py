@@ -16,16 +16,22 @@ def blackjack_game():
     (Card(CardValue.Seven, CardSuit.Spades), Card(CardValue.Eight, CardSuit.Spades), Card(CardValue.Seven, CardSuit.Spades), True),
     (Card(CardValue.Six, CardSuit.Spades), Card(CardValue.Seven, CardSuit.Spades), Card(CardValue.Eight, CardSuit.Spades), False)])
 def test_check_bust(blackjack_game, card1, card2, card3, expected):
-    assert blackjack_game.check_bust([card1, card2, card3]) is expected
+    blackjack_game.player_hand.reset()
+    blackjack_game.player_hand.add_card(card1)
+    blackjack_game.player_hand.add_card(card2)
+    blackjack_game.player_hand.add_card(card3)
+
+    assert blackjack_game.player_hand.is_bust() == expected
 
 
 def test_reset(blackjack_game):
-    blackjack_game.player_hand.append(Card(CardValue.Seven, CardSuit.Clubs))
-    blackjack_game.dealer_hand.append(Card(CardValue.Seven, CardSuit.Clubs))
-    blackjack_game.reset_hands()
+    blackjack_game.player_hand.add_card(Card(CardValue.Seven, CardSuit.Clubs))
+    blackjack_game.dealer_hand.add_card(Card(CardValue.Seven, CardSuit.Clubs))
+    blackjack_game.player_hand.reset()
+    blackjack_game.dealer_hand.reset()
 
-    assert len(blackjack_game.player_hand) == 0
-    assert len(blackjack_game.dealer_hand) == 0
+    assert len(blackjack_game.player_hand.cards()) == 0
+    assert len(blackjack_game.dealer_hand.cards()) == 0
 
 
 def test_check_print(blackjack_game):
@@ -43,7 +49,11 @@ def test_check_print(blackjack_game):
     (Card(CardValue.Seven, CardSuit.Spades), Card(CardValue.Three, CardSuit.Spades), Card(CardValue.Ten, CardSuit.Spades), GameWinner.Draw),
     (Card(CardValue.Six, CardSuit.Spades), Card(CardValue.Two, CardSuit.Spades), Card(CardValue.Nine, CardSuit.Spades), GameWinner.Dealer)])
 def test_check_winner(blackjack_game, card1, card2, card3, expected):
-    blackjack_game.player_hand.append(card1)
-    blackjack_game.player_hand.append(card2)
-    blackjack_game.dealer_hand.append(card3)
+    blackjack_game.player_hand.reset()
+    blackjack_game.dealer_hand.reset()
+
+    blackjack_game.player_hand.add_card(card1)
+    blackjack_game.player_hand.add_card(card2)
+    blackjack_game.dealer_hand.add_card(card3)
+
     assert blackjack_game.check_winner() == expected

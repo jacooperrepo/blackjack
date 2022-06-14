@@ -1,49 +1,120 @@
 """Blackjack card game"""
 from enum import Enum
 from colorama import Fore, Style
-from Pack.deck import Shoe
+from Pack.deck import Shoe, Card
 
 
-class GameWinner():
+class GameWinner(Enum):
     Player: str = "Player"
     Dealer: str = "Dealer"
     Draw: str = "Draw"
 
 
-class Blackjack():
+class HandStatus(Enum):
+    Main: str = "Main"
+    Split: str = "Split"
+    SplitMainEnded = "SplitMainEnded"
+    SplitEnd: str = "SplitEnd"
+    End = "End"
+
+
+class Hand:
+    def __init__(self):
+        self.status = HandStatus.Main
+        self.cards_in_hand = {"hand": [], "split_hand": []}
+
+    def cards(self):
+        return self.cards_in_hand["hand"]
+
+    def split_hand_cards(self):
+        return self.cards_in_hand["split_hand"]
+
+    def split(self):
+        self.status = HandStatus.Split
+        self.split_hand_cards().append(self.cards()[1])
+        self.cards().pop()
+
+    def reset(self):
+        self.cards_in_hand = {"hand": [], "split_hand": []}
+        self.status = HandStatus.Main
+
+    def add_card(self, card: Card):
+        if self.status == HandStatus.Main or self.status == HandStatus.Split:
+            self.cards().append(card)
+        elif self.status == HandStatus.SplitMainEnded:
+            self.split_hand_cards().append(card)
+        else:
+            pass
+
+    def total(self, split_hand:bool = False):
+        total = 0
+
+        if not split_hand:
+            for card in self.cards():
+                total += card.numerical_value()
+        else:
+            for card in self.split_hand_cards():
+                total += card.numerical_value()
+
+        return total
+
+    def end_hand(self):
+        if self.status == HandStatus.Main:
+            self.status = HandStatus.End
+        elif self.status == HandStatus.Split:
+            self.status = HandStatus.SplitMainEnded
+        elif self.status == HandStatus.SplitMainEnded:
+            self.status = HandStatus.SplitEnd
+        else:
+            pass
+
+    def is_bust(self, split_hand:bool = False) -> bool:
+        total = 0
+        if not split_hand:
+            for card in self.cards():
+                total += card.numerical_value()
+        else:
+            for card in self.split_hand_cards():
+                total += card.numerical_value()
+
+        if total > 21:
+            return True
+
+        return False
+
+
+class Blackjack:
     """Blackjack game class"""
-    _player_hand_end = False
-    _player_hand_split = False
 
     def __init__(self, shoe_size:int = 1):
         self.shoe_size = shoe_size
         self.shoe = Shoe(shoe_size)
-        self.player_hand = []
-        self.dealer_hand = []
+        self.player_hand = Hand()
+        self.dealer_hand = Hand()
 
     def __str__(self):
         output = '\n'*50
         output += Fore.GREEN + Style.BRIGHT + '------------------Blackjack------------------\n' \
                   + Style.RESET_ALL
-        if self._player_hand_end:
+        if self.player_hand.status == HandStatus.End:
             output += Fore.BLACK + Style.BRIGHT + '* '
         else:
             output += '  '
         output += Fore.LIGHTBLACK_EX + 'Dealer ' + Style.RESET_ALL
-        output += ' '.join(str(card) for card in self.dealer_hand)
+        output += ' '.join(str(card) for card in self.dealer_hand.cards())
         output += "\n"
-        if not self._player_hand_end:
+        if not self.player_hand.status == HandStatus.End:
             output += Fore.BLACK + Style.BRIGHT + '* '
         else:
             output += '  '
         output += Fore.LIGHTBLACK_EX + 'Player ' + Style.RESET_ALL
 
-        if self._player_hand_split:
-            output += ' '.join(str(card) for card in self.player_hand[0])
-            output += '|'
-            output += ' '.join(str(card) for card in self.player_hand[1])
+        if self.player_hand.status in(HandStatus.Split, HandStatus.SplitMainEnded, HandStatus.SplitEnd):
+            output += ' '.join(str(card) for card in self.player_hand.cards())
+            output += ' | '
+            output += ' '.join(str(card) for card in self.player_hand.split_hand_cards())
         else:
-            output += ' '.join(str(card) for card in self.player_hand)
+            output += ' '.join(str(card) for card in self.player_hand.cards())
 
         output += Fore.GREEN + Style.BRIGHT + '\n---------------------------------------------\n' \
                   + Style.RESET_ALL
@@ -57,14 +128,16 @@ class Blackjack():
 
         try:
             while keep_playing.upper() == 'Y':
-                self.dealer_hand.append(self.shoe.deal())
-                self.player_hand.append(self.shoe.deal())
+                self.dealer_hand.add_card(self.shoe.deal())
+                self.player_hand.add_card(self.shoe.deal())
 
                 self.process_input()
 
                 keep_playing = input('Play another hand? Y or N ')
 
-                self.reset_hands()
+                self.dealer_hand.reset()
+                self.player_hand.reset()
+
         except IndexError:
             print(Fore.RED + Style.BRIGHT + 'Out of cards' + Style.RESET_ALL)
 
@@ -78,22 +151,10 @@ class Blackjack():
                           'R to Reset Deck X to Split ')
 
             if entry.upper() == 'H':
-                if not self._player_hand_end:
-                    self.player_hand.append(self.shoe.deal())
-                    if self.check_bust(self.player_hand):
-                        print(self)
-                        print(Fore.RED + Style.BRIGHT + 'Player BUST! Dealer Wins!' \
-                              + Style.RESET_ALL)
-                        break
-                else:
-                    self.dealer_hand.append(self.shoe.deal())
-                    if self.check_bust(self.dealer_hand):
-                        print(self)
-                        print(Fore.GREEN + Style.BRIGHT + 'Dealer BUST! Player Wins!' \
-                              + Style.RESET_ALL)
-                        break
+                if not self.hit():
+                    break
             elif entry.upper() == 'S':
-                self._player_hand_end = True
+                self.player_hand.end_hand()
             elif entry.upper() == 'C':
                 print(self)
                 result = self.check_winner()
@@ -110,30 +171,34 @@ class Blackjack():
             elif entry.upper() == 'R':
                 self.shoe = Shoe(self.shoe_size)
             elif entry.upper() == 'X':
-                if len(self.player_hand) == 2 and \
-                        self.player_hand[1].value == self.player_hand[0].value:
-                    self.player_hand[0] = [self.player_hand[0], self.shoe.deal()]
-                    self.player_hand[1] = [self.player_hand[1], self.shoe.deal()]
-                    self._player_hand_split = True
+                self.player_hand.split()
 
-    @staticmethod
-    def check_bust(cards: list) -> bool:
-        """Check if hand is over 21"""
-        total = 0
-        for card in cards:
-            total += card.numerical_value()
+    def hit(self) -> bool:
+        success = True
 
-        if total > 21:
-            return True
+        if self.player_hand.status in(HandStatus.End, HandStatus.SplitEnd):
+            self.dealer_hand.add_card(self.shoe.deal())
+            if self.dealer_hand.is_bust():
+                print(self)
+                print(Fore.GREEN + Style.BRIGHT + 'Dealer BUST! Player Wins!' \
+                      + Style.RESET_ALL)
+                success = False
+        elif self.player_hand.status in(HandStatus.Main, HandStatus.Split):
+            self.player_hand.add_card(self.shoe.deal())
+            if self.player_hand.is_bust():
+                print(self)
+                print(Fore.RED + Style.BRIGHT + 'Player Hand BUST! Dealer Wins!' \
+                      + Style.RESET_ALL)
+                success = False
+        elif self.player_hand.status == HandStatus.SplitMainEnded:
+            self.player_hand.add_card(self.shoe.deal())
+            if self.player_hand.is_bust(split_hand=True):
+                print(self)
+                print(Fore.RED + Style.BRIGHT + 'Player Split Hand BUST! Dealer Wins!' \
+                      + Style.RESET_ALL)
+                success = False
 
-        return False
-
-    def reset_hands(self) -> None:
-        """Reset hands to starting state"""
-        self.player_hand.clear()
-        self.dealer_hand.clear()
-        self._player_hand_end = False
-        self._player_hand_split = False
+        return success
 
     def check_winner(self) -> str:
         """Check if player or dealer is the winner"""
@@ -143,7 +208,7 @@ class Blackjack():
         dealer_has_ace = False
         result = GameWinner.Draw
 
-        for card in self.player_hand:
+        for card in self.player_hand.cards():
             card_value = card.numerical_value()
             if card_value == 1:
                 card_value = 11
@@ -153,7 +218,7 @@ class Blackjack():
         if player_total > 21 and player_has_ace:
             player_total -= 10
 
-        for card in self.dealer_hand:
+        for card in self.dealer_hand.cards():
             card_value = card.numerical_value()
             if card_value == 1:
                 card_value = 11
@@ -163,13 +228,14 @@ class Blackjack():
         if dealer_total > 21 and dealer_has_ace:
             dealer_total -= 10
 
-        player_bust = player_total > 21
-        dealer_bust = dealer_total > 21
-
-        if player_total > dealer_total and not player_bust:
+        if player_total > dealer_total and not self.player_hand.is_bust():
             result = GameWinner.Player
-        elif dealer_total > player_total and not dealer_bust:
+        elif dealer_total > player_total and not self.dealer_hand.is_bust():
             result = GameWinner.Dealer
+        elif self.player_hand.is_bust():
+            result = GameWinner.Dealer
+        elif self.dealer_hand.is_bust():
+            result = GameWinner.Player
 
         return result
 
