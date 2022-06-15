@@ -1,5 +1,5 @@
 import pytest
-from blackjack import Blackjack, GameWinner
+from blackjack import Blackjack
 from Pack.deck import Card
 from Pack.card_attributes import CardSuit, CardValue
 
@@ -43,12 +43,12 @@ def test_check_print(blackjack_game):
 
 
 @pytest.mark.parametrize("card1, card2, card3, expected", [
-    (Card(CardValue.King, CardSuit.Spades), Card(CardValue.Ace, CardSuit.Spades), Card(CardValue.Two, CardSuit.Spades), GameWinner.Player),
-    (Card(CardValue.Eight, CardSuit.Spades), Card(CardValue.Two, CardSuit.Spades), Card(CardValue.Ace, CardSuit.Spades), GameWinner.Dealer),
-    (Card(CardValue.Ace, CardSuit.Spades), Card(CardValue.Five, CardSuit.Spades), Card(CardValue.Six, CardSuit.Spades), GameWinner.Player),
-    (Card(CardValue.Seven, CardSuit.Spades), Card(CardValue.Three, CardSuit.Spades), Card(CardValue.Ten, CardSuit.Spades), GameWinner.Draw),
-    (Card(CardValue.Six, CardSuit.Spades), Card(CardValue.Two, CardSuit.Spades), Card(CardValue.Nine, CardSuit.Spades), GameWinner.Dealer)])
-def test_check_winner(blackjack_game, card1, card2, card3, expected):
+    (Card(CardValue.King, CardSuit.Spades), Card(CardValue.Ace, CardSuit.Spades), Card(CardValue.Two, CardSuit.Spades), 0),
+    (Card(CardValue.Eight, CardSuit.Spades), Card(CardValue.Two, CardSuit.Spades), Card(CardValue.Ace, CardSuit.Spades), -1),
+    (Card(CardValue.Ace, CardSuit.Spades), Card(CardValue.Five, CardSuit.Spades), Card(CardValue.Six, CardSuit.Spades), 0),
+    (Card(CardValue.Seven, CardSuit.Spades), Card(CardValue.Three, CardSuit.Spades), Card(CardValue.Ten, CardSuit.Spades), -1),
+    (Card(CardValue.Six, CardSuit.Spades), Card(CardValue.Two, CardSuit.Spades), Card(CardValue.Nine, CardSuit.Spades), -1)])
+def test_check_player_winner(blackjack_game, card1, card2, card3, expected):
     blackjack_game.player_hand[0].reset()
     blackjack_game.dealer_hand.reset()
 
@@ -56,4 +56,6 @@ def test_check_winner(blackjack_game, card1, card2, card3, expected):
     blackjack_game.player_hand[0].add(card2)
     blackjack_game.dealer_hand.add(card3)
 
-    assert blackjack_game.check_winner() == expected
+    blackjack_game.check_winner()
+
+    assert blackjack_game.in_game_message.find('Player wins') >= expected

@@ -6,7 +6,7 @@ if __name__ == '__main__':
 
     """Find a Royal Flush"""
 
-    shoe = Shoe(100000)
+    shoe = Shoe(10000)
     hand_count = 0
 
     while shoe.remaining() >= 5:
