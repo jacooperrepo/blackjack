@@ -43,21 +43,21 @@ class Blackjack:
         output = '\n' * 50
         output += Fore.GREEN + Style.BRIGHT + '------------------Blackjack------------------\n' \
                   + Style.RESET_ALL
-        if self.player_status == PlayerHandStatus.Ended:
+        if self.player_status in(PlayerHandStatus.Ended, PlayerHandStatus.SplitEnded):
             output += Fore.BLACK + Style.BRIGHT + '* '
         else:
             output += '  '
         output += Fore.LIGHTBLACK_EX + 'Dealer ' + Style.RESET_ALL
         output += ' '.join(str(card) for card in self.dealer_hand.cards)
         output += "\n"
-        if not self.player_status == PlayerHandStatus.Ended:
+        if not self.player_status in(PlayerHandStatus.Ended, PlayerHandStatus.SplitEnded):
             output += Fore.BLACK + Style.BRIGHT + '* '
         else:
             output += '  '
         output += Fore.LIGHTBLACK_EX + 'Player ' + Style.RESET_ALL
 
-        if self.player_status in (
-        PlayerHandStatus.SplitInPlayHandOne, PlayerHandStatus.SplitInPlayHandTwo, PlayerHandStatus.SplitEnded):
+        if self.player_status in (PlayerHandStatus.SplitInPlayHandOne,
+                                  PlayerHandStatus.SplitInPlayHandTwo, PlayerHandStatus.SplitEnded):
             if self.player_status == PlayerHandStatus.SplitInPlayHandOne:
                 output += Fore.BLACK + Style.BRIGHT + "." + Style.RESET_ALL
             output += ' '.join(str(card) for card in self.player_hand[0].cards)
@@ -81,27 +81,25 @@ class Blackjack:
         self.player_hand[0].reset()
         self.player_hand[1].reset()
         self.player_status = PlayerHandStatus.InPlay
-        self.in_game_message = ''
 
     def play(self) -> None:
         """Game logic to run the game"""
-        keep_playing = 'Y'
+        keep_playing = ''
 
         try:
-            while keep_playing.upper() == 'Y':
+            while keep_playing != 'Q':
                 self.dealer_hand.add(self.shoe.deal())
                 self.player_hand[0].add(self.shoe.deal())
 
-                self.process_input()
-
-                keep_playing = input('Play another hand? Y or N ')
+                keep_playing = self.process_input()
+                print(self)
 
                 self.reset()
 
         except IndexError:
             print(Fore.RED + Style.BRIGHT + 'Out of cards' + Style.RESET_ALL)
 
-    def process_input(self) -> None:
+    def process_input(self) -> str:
         """Process player input"""
         entry = ''
 
@@ -111,9 +109,10 @@ class Blackjack:
             entry = input('H to Hit S to Stand F to Fold | C Check Winner \n'
                           'R to Reset Deck X to Split ')
 
+            self.in_game_message = ''
+
             if entry.upper() == 'H':  # Hit
                 if not self.hit() and self.player_status is not PlayerHandStatus.SplitInPlayHandTwo:
-                    print(self)
                     break
             elif entry.upper() == 'S':  # Stand
                 if self.player_status == PlayerHandStatus.InPlay:
@@ -124,11 +123,9 @@ class Blackjack:
                     self.player_status = PlayerHandStatus.SplitEnded
             elif entry.upper() == 'C':  # Check Winner
                 self.check_winner()
-                print(self)
                 break
             elif entry.upper() == 'F':  # Fold
                 self.in_game_message = Fore.BLUE + Style.BRIGHT + 'Dealer wins!' + Style.RESET_ALL
-                print(self)
                 break
             elif entry.upper() == 'R':  # Reset deck
                 self.shoe = Shoe(self.shoe_size)
@@ -138,6 +135,7 @@ class Blackjack:
                         self.player_status = PlayerHandStatus.SplitInPlayHandOne
                         self.player_hand[1].add(self.player_hand[0].cards[1])
                         self.player_hand[0].remove(self.player_hand[0].cards[1])
+        return entry.upper()
 
     def hit(self) -> bool:
         success = True

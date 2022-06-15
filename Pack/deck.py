@@ -131,7 +131,7 @@ class Deck(CardCollection):
         return deck
 
 
-class Shoe():
+class Shoe:
     """A shoe containing multiple decks"""
 
     def __init__(self, size:int = 1):
