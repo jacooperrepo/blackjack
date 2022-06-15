@@ -1,6 +1,6 @@
 import pytest
-from blackjack import Blackjack
-from Pack.deck import Card
+from blackjack import Blackjack, PlayerHandStatus
+from Pack.deck import Card, Spades
 from Pack.card_attributes import CardSuit, CardValue
 
 
@@ -31,7 +31,9 @@ def test_reset(blackjack_game):
     blackjack_game.dealer_hand.reset()
 
     assert len(blackjack_game.player_hand[0].cards) == 0
+    assert len(blackjack_game.player_hand[1].cards) == 0
     assert len(blackjack_game.dealer_hand.cards) == 0
+    assert blackjack_game.player_status == PlayerHandStatus.InPlay
 
 
 def test_check_print(blackjack_game):
@@ -59,3 +61,35 @@ def test_check_player_winner(blackjack_game, card1, card2, card3, expected):
     blackjack_game.check_winner()
 
     assert blackjack_game.in_game_message.find('Player wins') >= expected
+
+
+@pytest.mark.parametrize("card1, card2, expected", [
+    (Card(CardValue.King, CardSuit.Spades), Card(CardValue.Ace, CardSuit.Spades), 21),
+    (Card(CardValue.Ace, CardSuit.Spades), Card(CardValue.Ace, CardSuit.Spades), 12),
+    (Card(CardValue.Jack, CardSuit.Spades), Card(CardValue.Queen, CardSuit.Spades), 20),
+    (Card(CardValue.King, CardSuit.Spades), Card(CardValue.Three, CardSuit.Spades), 13),
+    (Card(CardValue.Six, CardSuit.Spades), Card(CardValue.Two, CardSuit.Spades), 8)])
+def test_total_hand(blackjack_game, card1, card2, expected):
+    assert blackjack_game.total_hand([card1, card2]) == expected
+
+
+def test_hit(blackjack_game):
+    blackjack_game.player_status = PlayerHandStatus.InPlay
+    blackjack_game.hit()
+    assert len(blackjack_game.player_hand[0].cards) == 1
+
+    blackjack_game.player_status = PlayerHandStatus.SplitInPlayHandOne
+    blackjack_game.hit()
+    assert len(blackjack_game.player_hand[0].cards) == 2
+
+    blackjack_game.player_status = PlayerHandStatus.SplitInPlayHandTwo
+    blackjack_game.hit()
+    assert len(blackjack_game.player_hand[0].cards) == 2
+    assert len(blackjack_game.player_hand[1].cards) == 1
+
+    blackjack_game.player_status = PlayerHandStatus.Ended
+    blackjack_game.hit()
+    assert len(blackjack_game.player_hand[0].cards) == 2
+    assert len(blackjack_game.player_hand[1].cards) == 1
+    assert len(blackjack_game.dealer_hand.cards) == 1
+
