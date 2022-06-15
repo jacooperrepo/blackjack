@@ -106,8 +106,21 @@ class Blackjack:
         while entry.upper() != 'Q':
             print(self)
 
-            entry = input('H to Hit S to Stand F to Fold | C Check Winner \n'
-                          'R to Reset Deck X to Split ')
+            entry = input('{}H {}to hit {}S {}to stand {}F {}to fold\n'
+                          '{}R {}to reset deck {}X {}to split {}Q {}to end '
+                          .format(Fore.LIGHTBLUE_EX,
+                                  Fore.LIGHTBLACK_EX,
+                                  Fore.LIGHTBLUE_EX,
+                                  Fore.LIGHTBLACK_EX,
+                                  Fore.LIGHTBLUE_EX,
+                                  Fore.LIGHTBLACK_EX,
+                                  Fore.LIGHTBLUE_EX,
+                                  Fore.LIGHTBLACK_EX,
+                                  Fore.LIGHTBLUE_EX,
+                                  Fore.LIGHTBLACK_EX,
+                                  Fore.LIGHTBLUE_EX,
+                                  Fore.LIGHTBLACK_EX
+                                  ))
 
             self.in_game_message = ''
 
@@ -115,15 +128,15 @@ class Blackjack:
                 if not self.hit() and self.player_status is not PlayerHandStatus.SplitInPlayHandTwo:
                     break
             elif entry.upper() == 'S':  # Stand
-                if self.player_status == PlayerHandStatus.InPlay:
+                if self.player_status in(PlayerHandStatus.Ended, PlayerHandStatus.SplitEnded):
+                    self.check_winner()
+                    break
+                elif self.player_status == PlayerHandStatus.InPlay:
                     self.player_status = PlayerHandStatus.Ended
                 elif self.player_status == PlayerHandStatus.SplitInPlayHandOne:
                     self.player_status = PlayerHandStatus.SplitInPlayHandTwo
                 elif self.player_status == PlayerHandStatus.SplitInPlayHandTwo:
                     self.player_status = PlayerHandStatus.SplitEnded
-            elif entry.upper() == 'C':  # Check Winner
-                self.check_winner()
-                break
             elif entry.upper() == 'F':  # Fold
                 self.in_game_message = Fore.BLUE + Style.BRIGHT + 'Dealer wins!' + Style.RESET_ALL
                 break
