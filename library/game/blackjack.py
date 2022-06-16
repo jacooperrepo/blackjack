@@ -277,8 +277,3 @@ class Blackjack:
                     self.player.wallet += self.split_bet * 2
             else:
                 self.player.wallet += self.split_bet
-
-
-if __name__ == "__main__":
-    game = Blackjack(5, 150)
-    game.play()
