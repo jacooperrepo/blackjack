@@ -81,25 +81,25 @@ def test_deck_reset(player_deck):
 
 
 def test_card_numerical_value_ace():
-    card = Diamonds(CardValue.Ace)
+    card = Diamonds(CardValue.ACE)
 
     assert card.numerical_value() == 1
 
 
 def test_card_numerical_value_jack():
-    card = Diamonds(CardValue.Jack)
+    card = Diamonds(CardValue.JACK)
 
     assert card.numerical_value() == 10
 
 
 def test_card_numerical_value_queen():
-    card = Diamonds(CardValue.Queen)
+    card = Diamonds(CardValue.QUEEN)
 
     assert card.numerical_value() == 10
 
 
 def test_card_numerical_value_king():
-    card = Diamonds(CardValue.King)
+    card = Diamonds(CardValue.KING)
 
     assert card.numerical_value() == 10
 
@@ -111,9 +111,9 @@ def test_card_numerical_value_joker():
 
 
 def test_add_card_to_deck(player_deck):
-    player_deck.add(Diamonds(CardValue.Ace))
+    player_deck.add(Diamonds(CardValue.ACE))
 
-    found_cards = filter(lambda card: card.value == CardValue.Ace and card.suit == CardSuit.Diamonds, player_deck.cards)
+    found_cards = filter(lambda card: card.value == CardValue.ACE and card.suit == CardSuit.DIAMONDS, player_deck.cards)
     found_cards_list = list(found_cards)
 
     assert len(found_cards_list) == 2
@@ -121,9 +121,9 @@ def test_add_card_to_deck(player_deck):
 
 
 def test_remove_card_from_deck(player_deck):
-    player_deck.remove(Spades(CardValue.Ace))
+    player_deck.remove(Spades(CardValue.ACE))
 
-    found_cards = filter(lambda card: card.value == CardValue.Ace and card.suit == CardSuit.Spades, player_deck.cards)
+    found_cards = filter(lambda card: card.value == CardValue.ACE and card.suit == CardSuit.SPADES, player_deck.cards)
     found_cards_list = list(found_cards)
 
     assert len(found_cards_list) == 0

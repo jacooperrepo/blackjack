@@ -8,7 +8,7 @@ class Hand(CardCollection):
     """Collection of blackjack for a hand in a card game"""
     def __init__(self):
         super().__init__([])
-        self.outcome = GameWinner.NotSet
+        self.outcome = GameWinner.NOTSET
 
     def blackjack(self) -> bool:
         """Return True or False if the hand is blackjack"""
@@ -16,7 +16,7 @@ class Hand(CardCollection):
         ten = False
         if len(self.cards) == 2:
             for card in self.cards:
-                if card.value == CardValue.Ace:
+                if card.value == CardValue.ACE:
                     ace = True
                 elif card.numerical_value() == 10:
                     ten = True
@@ -36,7 +36,7 @@ class Hand(CardCollection):
         ace_count = 0
 
         for card in self.cards:
-            if card.value == CardValue.Ace:
+            if card.value == CardValue.ACE:
                 ace_count += 1
                 total += 11
             else:
@@ -54,7 +54,7 @@ class Hand(CardCollection):
     def reset(self) -> None:
         """Regenerate the deck of blackjack"""
         super().reset()
-        self.outcome = GameWinner.NotSet
+        self.outcome = GameWinner.NOTSET
 
 
 class Player:
@@ -63,16 +63,10 @@ class Player:
         self.hand = Hand()
 
 
-class BlackJackDealer(Player):
-    """Blackjack dealer player"""
-    def __init__(self):
-        super().__init__()
-
-
 class BlackJackPlayer(Player):
     """Blackjack player"""
     def __init__(self, wallet_amount:float = 0):
         super().__init__()
         self.split_hand = Hand()
-        self.status = PlayerHandStatus.InPlay
+        self.status = PlayerHandStatus.IN_PLAY
         self.wallet: float = wallet_amount
