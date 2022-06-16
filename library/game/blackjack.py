@@ -194,12 +194,10 @@ class Blackjack:
             self.player.hand.add(self.shoe.deal())
             if self.player.hand.bust():
                 self.player.status = PlayerHandStatus.SplitInPlayHandTwo
-                success = False
         elif self.player.status == PlayerHandStatus.SplitInPlayHandTwo:
             self.player.split_hand.add(self.shoe.deal())
             if self.player.split_hand.bust():
                 self.player.status = PlayerHandStatus.SplitEnded
-                success = False
         else:
             self.dealer.hand.add(self.shoe.deal())
             if self.dealer.hand.bust():
