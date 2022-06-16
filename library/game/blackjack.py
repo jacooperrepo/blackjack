@@ -94,7 +94,7 @@ class Blackjack:
     def place_your_bets(self):
         """Get bet input from user"""
         valid_entry = False
-        valid_bet:float = 0
+        valid_bet = 0
 
         while not valid_entry:
             if self.player.wallet <= 0:
@@ -103,14 +103,14 @@ class Blackjack:
             bet = input('Place your bet: ')
 
             try:
-                if bet.isdigit():
-                    valid_bet = float(bet)
-                else:
-                    continue
-            except ValueError:
-                pass
-            else:
+                valid_bet = int(bet)
                 valid_entry = True
+            except ValueError:
+                try:
+                    valid_bet = float(bet)
+                    valid_entry = True
+                except ValueError:
+                    pass
 
         if self.player.wallet - valid_bet < 0:
             self.place_your_bets()
