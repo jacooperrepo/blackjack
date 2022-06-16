@@ -1,7 +1,7 @@
 import pytest
 from blackjack import Blackjack, PlayerHandStatus
-from Pack.deck import Card, Spades
-from Pack.card_attributes import CardSuit, CardValue
+from library.card.entities import Card
+from library.card.enums import CardSuit, CardValue
 
 
 @pytest.fixture(scope="class")

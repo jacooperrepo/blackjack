@@ -1,6 +1,6 @@
 """Testing the deck of cards"""
 import pytest
-from Pack.deck import Shoe, Deck, Joker, Diamonds, Spades, Clubs, Hearts, CardValue, CardSuit
+from library.card.entities import Shoe, Deck, Joker, Diamonds, Spades, Clubs, Hearts, CardValue, CardSuit
 
 
 @pytest.fixture

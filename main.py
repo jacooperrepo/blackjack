@@ -1,6 +1,6 @@
 # Testing deck
-from Pack.deck import Deck, Diamonds, Joker, Spades, Hearts, Clubs, Shoe, Card
-from Pack.card_attributes import CardSuit, CardValue
+from library.card.entities import Shoe
+from library.card.enums import CardValue
 
 if __name__ == '__main__':
 

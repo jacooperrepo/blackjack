@@ -1,7 +1,7 @@
 """Playing deck and cards"""
 from random import shuffle
 from colorama import Fore, Style
-from Pack.card_attributes import CardSuit, CardValue
+from library.card.enums import CardSuit, CardValue
 
 
 class Card:
