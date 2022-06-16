@@ -1,13 +1,16 @@
+"""Entities for the blackjack game"""
 from library.card.entities import CardCollection
 from library.card.enums import CardValue
 from library.game.enums import PlayerHandStatus
 
 
 class Hand(CardCollection):
+    """Collection of cards for a hand in a card game"""
     def __init__(self):
         super().__init__([])
 
     def blackjack(self) -> bool:
+        """Return True or False if the hand is blackjack"""
         ace = False
         ten = False
         if len(self.cards) == 2:
@@ -20,12 +23,14 @@ class Hand(CardCollection):
         return ace and ten
 
     def bust(self) -> bool:
+        """Return True or False if hand is bust"""
         if self.total() > 21:
             return True
 
         return False
 
     def total(self) -> int:
+        """Return total of hand. Note. Aces are considered 11 unless total exceeds 21"""
         total = 0
         ace_count = 0
 
@@ -47,16 +52,19 @@ class Hand(CardCollection):
 
 
 class Player:
+    """Generic player class"""
     def __init__(self):
         self.hand = Hand()
 
 
 class BlackJackDealer(Player):
+    """Blackjack dealer player"""
     def __init__(self):
         super().__init__()
 
 
 class BlackJackPlayer(Player):
+    """Blackjack player"""
     def __init__(self, wallet_amount:float = 0):
         super().__init__()
         self.split_hand = Hand()

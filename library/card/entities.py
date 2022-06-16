@@ -1,4 +1,4 @@
-"""Playing deck and cards"""
+"""Playing deck and cards entities"""
 from random import shuffle
 from colorama import Fore, Style
 from library.card.enums import CardSuit, CardValue
@@ -24,7 +24,7 @@ class Card:
 
 
 class Joker(Card):
-    """Jocker card"""
+    """Joker card"""
     def __init__(self):
         super().__init__(CardValue.Joker, CardSuit.Joker)
 
@@ -69,6 +69,7 @@ class Spades(Card):
 
 
 class CardCollection:
+    """Collection of cards and associated logic"""
     def __init__(self, cards:[]):
         self.cards = cards
 
@@ -90,6 +91,7 @@ class CardCollection:
             self.cards.remove(remove_card)
 
     def total(self) -> int:
+        """Total up cards in collection"""
         total = 0
         for card in self.cards:
             total += card.numerical_value()

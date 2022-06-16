@@ -5,6 +5,7 @@ from library.game.entities import BlackJackPlayer, BlackJackDealer
 from library.game.enums import GameWinner, PlayerHandStatus
 from library.exceptions.game import OutOfFundsException
 
+
 class Blackjack:
     """Blackjack game class"""
 
@@ -59,6 +60,7 @@ class Blackjack:
         return output
 
     def reset(self) -> None:
+        """Reset game and hands"""
         self.dealer.hand.reset()
         self.player.hand.reset()
         self.player.split_hand.reset()
@@ -84,6 +86,7 @@ class Blackjack:
             print(Fore.RED + Style.BRIGHT + 'Out of funds' + Style.RESET_ALL)
 
     def place_your_bets(self):
+        """Get bet input from user"""
         valid_entry = False
         valid_bet:float = 0
 
@@ -168,6 +171,7 @@ class Blackjack:
         return entry.upper()
 
     def hit(self) -> bool:
+        """Draw card and assign to hand"""
         success = True
 
         if self.player.status == PlayerHandStatus.InPlay:
