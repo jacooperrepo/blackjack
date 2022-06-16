@@ -1,5 +1,5 @@
 """Blackjack card game"""
-from colorama import Fore, Style
+from colorama import Fore, Style, Back
 from library.card.entities import Shoe
 from library.game.entities import BlackJackPlayer, BlackJackDealer
 from library.game.enums import GameWinner, PlayerHandStatus
@@ -21,10 +21,11 @@ class Blackjack:
 
     def __str__(self):
         output = '\n' * 50
-        output += Fore.LIGHTRED_EX + Style.NORMAL + "bet: $" + str(round(self.bet, 2)) + "\n"
+        output += Fore.BLACK + Style.RESET_ALL + "wallet:\t$" + str(round(self.player.wallet, 2)) + "\n"
+        output += Fore.LIGHTRED_EX + Style.NORMAL + "bet:\t$" + str(round(self.bet, 2)) + "\n"
         if self.split_bet > 0:
             output += Fore.LIGHTRED_EX + Style.NORMAL + "split bet: $" + str(round(self.split_bet, 2)) + "\n"
-        output += Fore.GREEN + Style.BRIGHT + '------------------Blackjack------------------\n' \
+        output += Fore.GREEN + Style.BRIGHT + '-'*16 + 'Blackjack' + '-'*16 + '\n' \
                   + Style.RESET_ALL
         if self.player.status in(PlayerHandStatus.Ended, PlayerHandStatus.SplitEnded):
             output += Fore.BLACK + Style.BRIGHT + '* '
@@ -51,11 +52,10 @@ class Blackjack:
         else:
             output += ' '.join(str(card) for card in self.player.hand.cards)
 
-        output += Fore.GREEN + Style.BRIGHT + '\n---------------------------------------------\n' \
-                  + Style.RESET_ALL
+        output += Fore.GREEN + Style.BRIGHT + '\n' + '-'*41 + '\n' + Style.RESET_ALL
+        output += Fore.GREEN + Style.NORMAL + 'blackjack pays (3/2)\n' + Style.RESET_ALL
         output += 'remaining cards: {}'.format(self.shoe.remaining())
         output += '\n'
-        output += Fore.BLACK + Style.RESET_ALL + "wallet: $" + str(round(self.player.wallet, 2)) + "\n"
         output += self.in_game_message
 
         return output
