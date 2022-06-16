@@ -168,13 +168,17 @@ class Blackjack:
             elif entry.upper() == 'X':  # Split
                 if len(self.player.hand.cards) == 2:
                     if self.player.hand.cards[0].value == self.player.hand.cards[1].value:
-                        self.player.status = PlayerHandStatus.SplitInPlayHandOne
-                        self.player.split_hand.add(self.player.hand.cards[1])
-                        self.player.hand.remove(self.player.hand.cards[1])
+                        # Split bet if funds allow
+                        if self.player.wallet - self.bet >= 0:
+                            self.player.status = PlayerHandStatus.SplitInPlayHandOne
+                            self.player.split_hand.add(self.player.hand.cards[1])
+                            self.player.hand.remove(self.player.hand.cards[1])
 
-                        # Split bet
-                        self.split_bet = self.bet
-                        self.player.wallet -= self.bet
+                            self.split_bet = self.bet
+                            self.player.wallet -= self.bet
+                        else:
+                            # Not enough funds to split hand
+                            pass
 
         return entry.upper()
 
