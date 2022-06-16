@@ -16,24 +16,24 @@ def blackjack_game():
     (Card(CardValue.Seven, CardSuit.Spades), Card(CardValue.Eight, CardSuit.Spades), Card(CardValue.Seven, CardSuit.Spades), True),
     (Card(CardValue.Six, CardSuit.Spades), Card(CardValue.Seven, CardSuit.Spades), Card(CardValue.Eight, CardSuit.Spades), False)])
 def test_check_bust(blackjack_game, card1, card2, card3, expected):
-    blackjack_game.player_hand[0].reset()
-    blackjack_game.player_hand[0].add(card1)
-    blackjack_game.player_hand[0].add(card2)
-    blackjack_game.player_hand[0].add(card3)
+    blackjack_game.player.hand.reset()
+    blackjack_game.player.hand.add(card1)
+    blackjack_game.player.hand.add(card2)
+    blackjack_game.player.hand.add(card3)
 
-    assert blackjack_game.player_hand[0].is_bust() == expected
+    assert blackjack_game.player.hand.is_bust() == expected
 
 
 def test_reset(blackjack_game):
-    blackjack_game.player_hand[0].add(Card(CardValue.Seven, CardSuit.Clubs))
-    blackjack_game.dealer_hand.add(Card(CardValue.Seven, CardSuit.Clubs))
-    blackjack_game.player_hand[0].reset()
-    blackjack_game.dealer_hand.reset()
+    blackjack_game.player.hand.add(Card(CardValue.Seven, CardSuit.Clubs))
+    blackjack_game.dealer.hand.add(Card(CardValue.Seven, CardSuit.Clubs))
+    blackjack_game.player.hand.reset()
+    blackjack_game.dealer.hand.reset()
 
-    assert len(blackjack_game.player_hand[0].cards) == 0
-    assert len(blackjack_game.player_hand[1].cards) == 0
-    assert len(blackjack_game.dealer_hand.cards) == 0
-    assert blackjack_game.player_status == PlayerHandStatus.InPlay
+    assert len(blackjack_game.player.hand.cards) == 0
+    assert len(blackjack_game.player.split_hand.cards) == 0
+    assert len(blackjack_game.dealer.hand.cards) == 0
+    assert blackjack_game.player.status == PlayerHandStatus.InPlay
 
 
 def test_check_print(blackjack_game):
@@ -51,12 +51,12 @@ def test_check_print(blackjack_game):
     (Card(CardValue.Seven, CardSuit.Spades), Card(CardValue.Three, CardSuit.Spades), Card(CardValue.Ten, CardSuit.Spades), -1),
     (Card(CardValue.Six, CardSuit.Spades), Card(CardValue.Two, CardSuit.Spades), Card(CardValue.Nine, CardSuit.Spades), -1)])
 def test_check_player_winner(blackjack_game, card1, card2, card3, expected):
-    blackjack_game.player_hand[0].reset()
-    blackjack_game.dealer_hand.reset()
+    blackjack_game.player.hand.reset()
+    blackjack_game.dealer.hand.reset()
 
-    blackjack_game.player_hand[0].add(card1)
-    blackjack_game.player_hand[0].add(card2)
-    blackjack_game.dealer_hand.add(card3)
+    blackjack_game.player.hand.add(card1)
+    blackjack_game.player.hand.add(card2)
+    blackjack_game.dealer.hand.add(card3)
 
     blackjack_game.check_winner()
 
@@ -74,22 +74,22 @@ def test_total_hand(blackjack_game, card1, card2, expected):
 
 
 def test_hit(blackjack_game):
-    blackjack_game.player_status = PlayerHandStatus.InPlay
+    blackjack_game.player.status = PlayerHandStatus.InPlay
     blackjack_game.hit()
-    assert len(blackjack_game.player_hand[0].cards) == 1
+    assert len(blackjack_game.player.hand.cards) == 1
 
-    blackjack_game.player_status = PlayerHandStatus.SplitInPlayHandOne
+    blackjack_game.player.status = PlayerHandStatus.SplitInPlayHandOne
     blackjack_game.hit()
-    assert len(blackjack_game.player_hand[0].cards) == 2
+    assert len(blackjack_game.player.hand.cards) == 2
 
-    blackjack_game.player_status = PlayerHandStatus.SplitInPlayHandTwo
+    blackjack_game.player.status = PlayerHandStatus.SplitInPlayHandTwo
     blackjack_game.hit()
-    assert len(blackjack_game.player_hand[0].cards) == 2
-    assert len(blackjack_game.player_hand[1].cards) == 1
+    assert len(blackjack_game.player.hand.cards) == 2
+    assert len(blackjack_game.player.split_hand.cards) == 1
 
-    blackjack_game.player_status = PlayerHandStatus.Ended
+    blackjack_game.player.status = PlayerHandStatus.Ended
     blackjack_game.hit()
-    assert len(blackjack_game.player_hand[0].cards) == 2
-    assert len(blackjack_game.player_hand[1].cards) == 1
-    assert len(blackjack_game.dealer_hand.cards) == 1
+    assert len(blackjack_game.player.hand.cards) == 2
+    assert len(blackjack_game.player.split_hand.cards) == 1
+    assert len(blackjack_game.dealer.hand.cards) == 1
 
