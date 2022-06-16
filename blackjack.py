@@ -15,7 +15,7 @@ class Blackjack:
         self.player = BlackJackPlayer()
         self.player.wallet = wallet_amount
         self.bet:float = 0
-        self.winnings:float = 0
+        self.split_bet:float = 0
         self.dealer = BlackJackDealer()
         self.in_game_message = ''
 
@@ -64,6 +64,8 @@ class Blackjack:
         self.player.hand.reset()
         self.player.split_hand.reset()
         self.player.status = PlayerHandStatus.InPlay
+        self.bet = 0
+        self.split_bet = 0
 
     def play(self) -> None:
         """Game logic to run the game"""
@@ -168,8 +170,7 @@ class Blackjack:
                         self.player.hand.remove(self.player.hand.cards[1])
 
                         # Split bet
-
-
+                        self.split_bet = self.bet
 
         return entry.upper()
 
@@ -271,11 +272,11 @@ class Blackjack:
             if not self.player.split_hand.outcome == GameWinner.Draw:
                 # Blackjack pays 3 to 2
                 if self.player.split_hand.blackjack():
-                    self.player.wallet += (self.bet * (3 / 2))
+                    self.player.wallet += (self.split_bet * (3 / 2))
                 else:
-                    self.player.wallet += self.bet * 2
+                    self.player.wallet += self.split_bet * 2
             else:
-                self.player.wallet += self.bet
+                self.player.wallet += self.split_bet
 
 
 if __name__ == "__main__":
