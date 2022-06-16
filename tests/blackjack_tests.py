@@ -1,5 +1,5 @@
 import pytest
-from blackjack import Blackjack
+from library.game.blackjack import Blackjack
 from library.card.entities import Card
 from library.card.enums import CardSuit, CardValue
 from library.game.enums import PlayerHandStatus
