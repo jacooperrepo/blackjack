@@ -121,26 +121,11 @@ class Deck(CardCollection):
         """Generate new pack of 52 blackjack"""
         deck = []
 
-        deck.append(Diamonds(CardValue.Ace))
-        deck.append(Diamonds(CardValue.Ace))
-        deck.append(Diamonds(CardValue.Ace))
-        deck.append(Diamonds(CardValue.Ace))
-
-        deck.append(Diamonds(CardValue.Ten))
-        deck.append(Diamonds(CardValue.Ten))
-        deck.append(Diamonds(CardValue.Ace))
-        deck.append(Diamonds(CardValue.Ace))
-        deck.append(Diamonds(CardValue.Ace))
-        deck.append(Diamonds(CardValue.Ace))
-        deck.append(Diamonds(CardValue.Ace))
-
-
-
-        # for value in filter(lambda card_value: card_value is not CardValue.Joker, CardValue):
-        #    deck.append(Diamonds(value))
-        #    deck.append(Clubs(value))
-        #    deck.append(Hearts(value))
-        #    deck.append(Spades(value))
+        for value in filter(lambda card_value: card_value is not CardValue.Joker, CardValue):
+            deck.append(Diamonds(value))
+            deck.append(Clubs(value))
+            deck.append(Hearts(value))
+            deck.append(Spades(value))
 
         if with_joker:
             deck.append(Joker())
@@ -164,7 +149,7 @@ class Shoe:
             for card in Deck().cards:
                 shoe.append(card)
 
-        #shuffle(shoe)
+        shuffle(shoe)
         self.cards = shoe
 
     def deal(self) -> Card:

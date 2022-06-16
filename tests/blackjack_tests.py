@@ -43,7 +43,7 @@ def test_check_print(blackjack_game):
 
     assert output.index('Player') > 0
     assert output.index('Dealer') > 0
-    assert output.index('remaining blackjack') > 0
+    assert output.index('remaining cards') > 0
 
 
 @pytest.mark.parametrize("card1, card2, card3, expected", [
