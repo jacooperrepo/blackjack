@@ -172,51 +172,35 @@ class Blackjack:
 
         if self.player.status == PlayerHandStatus.InPlay:
             self.player.hand.add(self.shoe.deal())
-            if self.player.hand.is_bust():
+            if self.player.hand.bust():
                 self.in_game_message = Fore.RED + Style.BRIGHT + 'Player Hand BUST! Dealer Wins!' \
                                        + Style.RESET_ALL
                 success = False
         elif self.player.status == PlayerHandStatus.SplitInPlayHandOne:
             self.player.hand.add(self.shoe.deal())
-            if self.player.hand.is_bust():
+            if self.player.hand.bust():
                 self.in_game_message = Fore.RED + Style.BRIGHT + 'Player Hand BUST! Dealer Wins!' \
                                        + Style.RESET_ALL
                 self.player.status = PlayerHandStatus.SplitInPlayHandTwo
                 success = False
         elif self.player.status == PlayerHandStatus.SplitInPlayHandTwo:
             self.player.split_hand.add(self.shoe.deal())
-            if self.player.split_hand.is_bust():
+            if self.player.split_hand.bust():
                 self.in_game_message = Fore.RED + Style.BRIGHT + 'Player Split Hand BUST! Dealer Wins!' \
                                        + Style.RESET_ALL
                 self.player.status = PlayerHandStatus.SplitEnded
                 success = False
         else:
             self.dealer.hand.add(self.shoe.deal())
-            if self.dealer.hand.is_bust():
+            if self.dealer.hand.bust():
                 self.in_game_message = Fore.GREEN + Style.BRIGHT + 'Dealer BUST! Player Wins!' \
                                        + Style.RESET_ALL
                 success = False
 
         return success
 
-    @staticmethod
-    def total_hand(cards: []) -> int:
-        total = 0
-        has_ace = False
-
-        for card in cards:
-            card_value = card.numerical_value()
-            if card_value == 1:
-                card_value = 11
-                has_ace = True
-            total += card_value
-
-        if total > 21 and has_ace:
-            total -= 10
-
-        return total
-
     def winner_messaging(self, player_total: int, dealer_total: int, split_hand:bool = False):
+        """Apply messaging to gaem for game outcome"""
         split_hand_text = ''
 
         if self.player.status in (PlayerHandStatus.SplitInPlayHandOne, PlayerHandStatus.SplitInPlayHandTwo,
@@ -247,20 +231,21 @@ class Blackjack:
     def check_winner(self) -> None:
         """Check if player or dealer is the winner"""
 
-        dealer_total = self.total_hand(self.dealer.hand.cards)
-        player_total = self.total_hand(self.player.hand.cards)
+        dealer_total = self.dealer.hand.total()
+        player_total = self.player.hand.total()
 
         self.in_game_message = ''
         self.winner_messaging(player_total, dealer_total)
 
         if self.player.status in (PlayerHandStatus.SplitInPlayHandOne, PlayerHandStatus.SplitInPlayHandTwo,
                                   PlayerHandStatus.SplitEnded):
-            self.winner_messaging(self.total_hand(self.player.split_hand.cards), dealer_total, True)
+            self.winner_messaging(self.player.split_hand.total(), dealer_total, True)
 
         if self.winner == GameWinner.Player:
             self.calculate_winnings()
 
     def calculate_winnings(self):
+        """Calculate winnings for Player"""
         self.player.wallet += self.bet * 2
 
 

@@ -1,7 +1,9 @@
 import pytest
-from blackjack import Blackjack, PlayerHandStatus
+from blackjack import Blackjack
 from library.card.entities import Card
 from library.card.enums import CardSuit, CardValue
+from library.game.enums import PlayerHandStatus
+from library.game.entities import Hand
 
 
 @pytest.fixture(scope="class")
@@ -21,7 +23,7 @@ def test_check_bust(blackjack_game, card1, card2, card3, expected):
     blackjack_game.player.hand.add(card2)
     blackjack_game.player.hand.add(card3)
 
-    assert blackjack_game.player.hand.is_bust() == expected
+    assert blackjack_game.player.hand.bust() == expected
 
 
 def test_reset(blackjack_game):
@@ -63,14 +65,17 @@ def test_check_player_winner(blackjack_game, card1, card2, card3, expected):
     assert blackjack_game.in_game_message.find('Player wins') >= expected
 
 
-@pytest.mark.parametrize("card1, card2, expected", [
-    (Card(CardValue.King, CardSuit.Spades), Card(CardValue.Ace, CardSuit.Spades), 21),
-    (Card(CardValue.Ace, CardSuit.Spades), Card(CardValue.Ace, CardSuit.Spades), 12),
-    (Card(CardValue.Jack, CardSuit.Spades), Card(CardValue.Queen, CardSuit.Spades), 20),
-    (Card(CardValue.King, CardSuit.Spades), Card(CardValue.Three, CardSuit.Spades), 13),
-    (Card(CardValue.Six, CardSuit.Spades), Card(CardValue.Two, CardSuit.Spades), 8)])
-def test_total_hand(blackjack_game, card1, card2, expected):
-    assert blackjack_game.total_hand([card1, card2]) == expected
+@pytest.mark.parametrize("card1, card2, card3, expected", [
+    (Card(CardValue.King, CardSuit.Spades), Card(CardValue.Ace, CardSuit.Spades), Card(CardValue.Ace, CardSuit.Spades), 12),
+    (Card(CardValue.Ace, CardSuit.Spades), Card(CardValue.Ace, CardSuit.Spades), Card(CardValue.Ace, CardSuit.Spades), 13),
+    (Card(CardValue.Jack, CardSuit.Spades), Card(CardValue.Queen, CardSuit.Spades), Card(CardValue.Ace, CardSuit.Spades), 21),
+    (Card(CardValue.King, CardSuit.Spades), Card(CardValue.Three, CardSuit.Spades), Card(CardValue.Ace, CardSuit.Spades), 14),
+    (Card(CardValue.Six, CardSuit.Spades), Card(CardValue.Two, CardSuit.Spades), Card(CardValue.Ace, CardSuit.Spades), 19)])
+def test_total_hand(blackjack_game, card1, card2, card3, expected):
+    blackjack_game.player.hand.add(card1)
+    blackjack_game.player.hand.add(card2)
+    blackjack_game.player.hand.add(card3)
+    assert blackjack_game.player.hand.total() == expected
 
 
 def test_hit(blackjack_game):
@@ -93,3 +98,15 @@ def test_hit(blackjack_game):
     assert len(blackjack_game.player.split_hand.cards) == 1
     assert len(blackjack_game.dealer.hand.cards) == 1
 
+
+@pytest.mark.parametrize("card1, card2, expected", [
+    (Card(CardValue.King, CardSuit.Spades), Card(CardValue.Ace, CardSuit.Spades), True),
+    (Card(CardValue.Ten, CardSuit.Spades), Card(CardValue.Ace, CardSuit.Spades), True),
+    (Card(CardValue.Ace, CardSuit.Spades), Card(CardValue.Ace, CardSuit.Spades), False),
+    (Card(CardValue.Three, CardSuit.Spades), Card(CardValue.Ace, CardSuit.Spades), False),
+    (Card(CardValue.Nine, CardSuit.Spades), Card(CardValue.Ace, CardSuit.Spades), False)])
+def test_blackjack_hand(card1, card2, expected):
+    hand = Hand()
+    hand.add(card1)
+    hand.add(card2)
+    assert hand.blackjack() == expected
