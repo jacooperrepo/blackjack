@@ -82,10 +82,12 @@ def test_hit(blackjack_game):
     blackjack_game.player.status = PlayerHandStatus.InPlay
     blackjack_game.hit()
     assert len(blackjack_game.player.hand.cards) == 1
+    assert len(blackjack_game.player.split_hand.cards) == 0
 
     blackjack_game.player.status = PlayerHandStatus.SplitInPlayHandOne
     blackjack_game.hit()
     assert len(blackjack_game.player.hand.cards) == 2
+    assert len(blackjack_game.player.split_hand.cards) == 0
 
     blackjack_game.player.status = PlayerHandStatus.SplitInPlayHandTwo
     blackjack_game.hit()
