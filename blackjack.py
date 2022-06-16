@@ -15,13 +15,15 @@ class Blackjack:
         self.player = BlackJackPlayer()
         self.player.wallet = wallet_amount
         self.bet:float = 0
-        self.winnings:float = 0
+        self.split_bet:float = 0
         self.dealer = BlackJackDealer()
         self.in_game_message = ''
 
     def __str__(self):
         output = '\n' * 50
         output += Fore.LIGHTRED_EX + Style.NORMAL + "bet: $" + str(round(self.bet, 2)) + "\n"
+        if self.split_bet > 0:
+            output += Fore.LIGHTRED_EX + Style.NORMAL + "split bet: $" + str(round(self.split_bet, 2)) + "\n"
         output += Fore.GREEN + Style.BRIGHT + '------------------Blackjack------------------\n' \
                   + Style.RESET_ALL
         if self.player.status in(PlayerHandStatus.Ended, PlayerHandStatus.SplitEnded):
@@ -47,7 +49,7 @@ class Blackjack:
                 output += Fore.BLACK + Style.BRIGHT + "." + Style.RESET_ALL
             output += ' '.join(str(card) for card in self.player.hand.cards)
         else:
-            output += ' '.join(str(card) for card in self.player.hand.cards)
+            output += ' '.join(str(card) for card in self.player.split_hand.cards)
 
         output += Fore.GREEN + Style.BRIGHT + '\n---------------------------------------------\n' \
                   + Style.RESET_ALL
@@ -64,6 +66,8 @@ class Blackjack:
         self.player.hand.reset()
         self.player.split_hand.reset()
         self.player.status = PlayerHandStatus.InPlay
+        self.bet = 0
+        self.split_bet = 0
 
     def play(self) -> None:
         """Game logic to run the game"""
@@ -80,7 +84,7 @@ class Blackjack:
                 self.reset()
 
         except IndexError:
-            print(Fore.RED + Style.BRIGHT + 'Out of blackjack' + Style.RESET_ALL)
+            print(Fore.RED + Style.BRIGHT + 'Out of cards' + Style.RESET_ALL)
         except OutOfFundsException:
             print(Fore.RED + Style.BRIGHT + 'Out of funds' + Style.RESET_ALL)
 
@@ -144,6 +148,7 @@ class Blackjack:
 
             if entry.upper() == 'H':  # Hit
                 if not self.hit() and self.player.status is not PlayerHandStatus.SplitInPlayHandTwo:
+                    self.check_winner()
                     break
             elif entry.upper() == 'S':  # Stand
                 if self.player.status in(PlayerHandStatus.Ended, PlayerHandStatus.SplitEnded):
@@ -168,8 +173,8 @@ class Blackjack:
                         self.player.hand.remove(self.player.hand.cards[1])
 
                         # Split bet
-
-
+                        self.split_bet = self.bet
+                        self.player.wallet -= self.bet
 
         return entry.upper()
 
@@ -182,6 +187,7 @@ class Blackjack:
             if self.player.hand.bust():
                 self.in_game_message = Fore.RED + Style.BRIGHT + 'Player Hand BUST! Dealer Wins!' \
                                        + Style.RESET_ALL
+                self.player.hand.outcome = GameWinner.Dealer
                 success = False
         elif self.player.status == PlayerHandStatus.SplitInPlayHandOne:
             self.player.hand.add(self.shoe.deal())
@@ -189,6 +195,7 @@ class Blackjack:
                 self.in_game_message = Fore.RED + Style.BRIGHT + 'Player Hand BUST! Dealer Wins!' \
                                        + Style.RESET_ALL
                 self.player.status = PlayerHandStatus.SplitInPlayHandTwo
+                self.player.hand.outcome = GameWinner.Dealer
                 success = False
         elif self.player.status == PlayerHandStatus.SplitInPlayHandTwo:
             self.player.split_hand.add(self.shoe.deal())
@@ -196,12 +203,19 @@ class Blackjack:
                 self.in_game_message = Fore.RED + Style.BRIGHT + 'Player Split Hand BUST! Dealer Wins!' \
                                        + Style.RESET_ALL
                 self.player.status = PlayerHandStatus.SplitEnded
+                self.player.split_hand.outcome = GameWinner.Dealer
                 success = False
         else:
             self.dealer.hand.add(self.shoe.deal())
             if self.dealer.hand.bust():
                 self.in_game_message = Fore.GREEN + Style.BRIGHT + 'Dealer BUST! Player Wins!' \
                                        + Style.RESET_ALL
+                if not self.player.hand.bust():
+                    self.player.hand.outcome = GameWinner.Player
+
+                if not self.player.split_hand.bust():
+                    self.player.split_hand.outcome = GameWinner.Player
+
                 success = False
 
         return success
@@ -271,13 +285,13 @@ class Blackjack:
             if not self.player.split_hand.outcome == GameWinner.Draw:
                 # Blackjack pays 3 to 2
                 if self.player.split_hand.blackjack():
-                    self.player.wallet += (self.bet * (3 / 2))
+                    self.player.wallet += (self.split_bet * (3 / 2))
                 else:
-                    self.player.wallet += self.bet * 2
+                    self.player.wallet += self.split_bet * 2
             else:
-                self.player.wallet += self.bet
+                self.player.wallet += self.split_bet
 
 
 if __name__ == "__main__":
-    game = Blackjack(1, 150)
+    game = Blackjack(5, 150)
     game.play()
