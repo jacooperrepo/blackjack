@@ -5,7 +5,7 @@ from library.game.enums import PlayerHandStatus, GameWinner
 
 
 class Hand(CardCollection):
-    """Collection of cards for a hand in a card game"""
+    """Collection of blackjack for a hand in a card game"""
     def __init__(self):
         super().__init__([])
         self.outcome = GameWinner.NotSet
@@ -52,7 +52,7 @@ class Hand(CardCollection):
         return total
 
     def reset(self) -> None:
-        """Regenerate the deck of cards"""
+        """Regenerate the deck of blackjack"""
         super().reset()
         self.outcome = GameWinner.NotSet
 

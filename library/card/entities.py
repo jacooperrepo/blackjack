@@ -1,4 +1,4 @@
-"""Playing deck and cards entities"""
+"""Playing deck and blackjack entities"""
 from random import shuffle
 from colorama import Fore, Style
 from library.card.enums import CardSuit, CardValue
@@ -69,7 +69,7 @@ class Spades(Card):
 
 
 class CardCollection:
-    """Collection of cards and associated logic"""
+    """Collection of blackjack and associated logic"""
     def __init__(self, cards:[]):
         self.cards = cards
 
@@ -91,19 +91,19 @@ class CardCollection:
             self.cards.remove(remove_card)
 
     def total(self) -> int:
-        """Total up cards in collection"""
+        """Total up blackjack in collection"""
         total = 0
         for card in self.cards:
             total += card.numerical_value()
         return total
 
     def reset(self) -> None:
-        """Regenerate the deck of cards"""
+        """Regenerate the deck of blackjack"""
         self.cards = []
 
 
 class Deck(CardCollection):
-    """Playing deck of cards"""
+    """Playing deck of blackjack"""
     def __init__(self, with_joker: bool = False, and_shuffle: bool = False):
         super().__init__(self.generate_deck(with_joker))
 
@@ -111,14 +111,14 @@ class Deck(CardCollection):
             self.shuffle()
 
     def reset(self, with_joker: bool = False, and_shuffle: bool = False) -> None:
-        """Regenerate the deck of cards"""
+        """Regenerate the deck of blackjack"""
         self.cards = self.generate_deck(with_joker)
         if and_shuffle:
             self.shuffle()
 
     @staticmethod
     def generate_deck(with_joker: bool) -> list:
-        """Generate new pack of 52 cards"""
+        """Generate new pack of 52 blackjack"""
         deck = []
 
         for value in filter(lambda card_value: card_value is not CardValue.Joker, CardValue):
@@ -157,7 +157,7 @@ class Shoe:
         return self.cards.pop()
 
     def remaining(self) -> int:
-        """Return remaining cards in shoe"""
+        """Return remaining blackjack in shoe"""
         return len(self.cards)
 
     def reset(self, size: int = 1):

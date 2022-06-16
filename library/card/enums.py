@@ -1,4 +1,4 @@
-"""Enumerations for cards"""
+"""Enumerations for blackjack"""
 from enum import Enum
 
 

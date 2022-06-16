@@ -51,7 +51,7 @@ class Blackjack:
 
         output += Fore.GREEN + Style.BRIGHT + '\n---------------------------------------------\n' \
                   + Style.RESET_ALL
-        output += 'remaining cards: {}'.format(self.shoe.remaining())
+        output += 'remaining blackjack: {}'.format(self.shoe.remaining())
         output += '\n'
         output += Fore.BLACK + Style.RESET_ALL + "wallet: $" + str(round(self.player.wallet, 2)) + "\n"
         output += self.in_game_message
@@ -80,7 +80,7 @@ class Blackjack:
                 self.reset()
 
         except IndexError:
-            print(Fore.RED + Style.BRIGHT + 'Out of cards' + Style.RESET_ALL)
+            print(Fore.RED + Style.BRIGHT + 'Out of blackjack' + Style.RESET_ALL)
         except OutOfFundsException:
             print(Fore.RED + Style.BRIGHT + 'Out of funds' + Style.RESET_ALL)
 
@@ -166,6 +166,10 @@ class Blackjack:
                         self.player.status = PlayerHandStatus.SplitInPlayHandOne
                         self.player.split_hand.add(self.player.hand.cards[1])
                         self.player.hand.remove(self.player.hand.cards[1])
+
+                        # Split bet
+
+
 
         return entry.upper()
 

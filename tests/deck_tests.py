@@ -1,4 +1,4 @@
-"""Testing the deck of cards"""
+"""Testing the deck of blackjack"""
 import pytest
 from library.card.entities import Shoe, Deck, Joker, Diamonds, Spades, Clubs, Hearts, CardValue, CardSuit
 
