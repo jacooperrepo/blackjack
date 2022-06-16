@@ -12,11 +12,11 @@ class Card:
 
     def numerical_value(self) -> int:
         """Numerical value of card"""
-        if self.value is CardValue.Joker:
+        if self.value is CardValue.JOKER:
             card_num_value = 0
-        elif self.value is CardValue.Ace:
+        elif self.value is CardValue.ACE:
             card_num_value = 1
-        elif self.value in(CardValue.Jack, CardValue.Queen, CardValue.King):
+        elif self.value in(CardValue.JACK, CardValue.QUEEN, CardValue.KING):
             card_num_value = 10
         else:
             card_num_value = int(self.value.value)
@@ -26,7 +26,7 @@ class Card:
 class Joker(Card):
     """Joker card"""
     def __init__(self):
-        super().__init__(CardValue.Joker, CardSuit.Joker)
+        super().__init__(CardValue.JOKER, CardSuit.JOKER)
 
     def __str__(self):
         return  f"{Fore.GREEN + Style.BRIGHT}🃏{self.value.value}" + Style.RESET_ALL
@@ -35,7 +35,7 @@ class Joker(Card):
 class Diamonds(Card):
     """Diamonds suit card"""
     def __init__(self, value):
-        super().__init__(value, CardSuit.Diamonds)
+        super().__init__(value, CardSuit.DIAMONDS)
 
     def __str__(self):
         return  f"{Fore.RED + Style.BRIGHT}♦{self.value.value}" + Style.RESET_ALL
@@ -44,7 +44,7 @@ class Diamonds(Card):
 class Hearts(Card):
     """Hearts suit card"""
     def __init__(self, value):
-        super().__init__(value, CardSuit.Hearts)
+        super().__init__(value, CardSuit.HEARTS)
 
     def __str__(self):
         return  f"{Fore.RED + Style.BRIGHT}♥{self.value.value}" + Style.RESET_ALL
@@ -53,7 +53,7 @@ class Hearts(Card):
 class Clubs(Card):
     """Clubs suit card"""
     def __init__(self, value):
-        super().__init__(value, CardSuit.Clubs)
+        super().__init__(value, CardSuit.CLUBS)
 
     def __str__(self):
         return  f"{Fore.BLACK + Style.BRIGHT}♣︎{self.value.value}" + Style.RESET_ALL
@@ -62,7 +62,7 @@ class Clubs(Card):
 class Spades(Card):
     """Spades suit card"""
     def __init__(self, value):
-        super().__init__(value, CardSuit.Spades)
+        super().__init__(value, CardSuit.SPADES)
 
     def __str__(self):
         return  f"{Fore.BLACK + Style.BRIGHT}♠{self.value.value}" + Style.RESET_ALL
@@ -73,7 +73,7 @@ class CardCollection:
     def __init__(self, cards:[]):
         self.cards = cards
 
-    def shuffle(self) -> None:
+    def shuffle_cards(self) -> None:
         """Shuffle the deck"""
         shuffle(self.cards)
 
@@ -87,7 +87,8 @@ class CardCollection:
 
     def remove(self, card: Card) -> None:
         """Remove a card from the deck"""
-        for remove_card in filter(lambda target: target.value == card.value and target.suit == card.suit, self.cards):
+        for remove_card in filter(lambda target: target.value == card.value \
+                                  and target.suit == card.suit, self.cards):
             self.cards.remove(remove_card)
 
     def total(self) -> int:
@@ -104,24 +105,23 @@ class CardCollection:
 
 class Deck(CardCollection):
     """Playing deck of blackjack"""
-    def __init__(self, with_joker: bool = False, and_shuffle: bool = False):
+    def __init__(self, with_joker: bool = False, shuffle_cards: bool = False):
         super().__init__(self.generate_deck(with_joker))
 
-        if and_shuffle:
-            self.shuffle()
+        self.has_joker = with_joker
+        if shuffle_cards:
+            self.shuffle_cards()
 
-    def reset(self, with_joker: bool = False, and_shuffle: bool = False) -> None:
+    def reset(self) -> None:
         """Regenerate the deck of blackjack"""
-        self.cards = self.generate_deck(with_joker)
-        if and_shuffle:
-            self.shuffle()
+        self.cards = self.generate_deck(self.has_joker)
 
     @staticmethod
     def generate_deck(with_joker: bool) -> list:
         """Generate new pack of 52 blackjack"""
         deck = []
 
-        for value in filter(lambda card_value: card_value is not CardValue.Joker, CardValue):
+        for value in filter(lambda card_value: card_value is not CardValue.JOKER, CardValue):
             deck.append(Diamonds(value))
             deck.append(Clubs(value))
             deck.append(Hearts(value))
@@ -164,4 +164,3 @@ class Shoe:
         """Reset shoe to desired deck count"""
         self.size = size
         self.generate_shoe()
-

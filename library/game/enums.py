@@ -4,18 +4,16 @@ from enum import Enum
 
 class GameWinner(Enum):
     """Indication of winner in game"""
-    NotSet: str = "NotSet"
-    Player: str = "Player"
-    Dealer: str = "Dealer"
-    Draw: str = "Draw"
+    NOTSET: str = "NotSet"
+    PLAYER: str = "Player"
+    DEALER: str = "Dealer"
+    DRAW: str = "Draw"
 
 
 class PlayerHandStatus(Enum):
     """Status of player hand in blackjack game"""
-    InPlay: str = "InPlay"
-    SplitInPlayHandOne: str = "SplitInPlayHandOne"
-    SplitInPlayHandTwo: str = "SplitInPlayHandTwo"
-    SplitEnded: str = "SplitEnded"
-    Ended: str = "Ended"
-
-
+    IN_PLAY: str = "InPlay"
+    SPLIT_IN_PLAY_HAND_ONE: str = "SplitInPlayHandOne"
+    SPLIT_IN_PLAY_HAND_TWO: str = "SplitInPlayHandTwo"
+    SPLIT_ENDED: str = "SplitEnded"
+    ENDED: str = "Ended"
