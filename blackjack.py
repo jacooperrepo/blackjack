@@ -47,13 +47,13 @@ class Blackjack:
             output += '|'
             if self.player.status == PlayerHandStatus.SplitInPlayHandTwo:
                 output += Fore.BLACK + Style.BRIGHT + "." + Style.RESET_ALL
-            output += ' '.join(str(card) for card in self.player.hand.cards)
-        else:
             output += ' '.join(str(card) for card in self.player.split_hand.cards)
+        else:
+            output += ' '.join(str(card) for card in self.player.hand.cards)
 
         output += Fore.GREEN + Style.BRIGHT + '\n---------------------------------------------\n' \
                   + Style.RESET_ALL
-        output += 'remaining blackjack: {}'.format(self.shoe.remaining())
+        output += 'remaining cards: {}'.format(self.shoe.remaining())
         output += '\n'
         output += Fore.BLACK + Style.RESET_ALL + "wallet: $" + str(round(self.player.wallet, 2)) + "\n"
         output += self.in_game_message
@@ -185,37 +185,20 @@ class Blackjack:
         if self.player.status == PlayerHandStatus.InPlay:
             self.player.hand.add(self.shoe.deal())
             if self.player.hand.bust():
-                self.in_game_message = Fore.RED + Style.BRIGHT + 'Player Hand BUST! Dealer Wins!' \
-                                       + Style.RESET_ALL
-                self.player.hand.outcome = GameWinner.Dealer
                 success = False
         elif self.player.status == PlayerHandStatus.SplitInPlayHandOne:
             self.player.hand.add(self.shoe.deal())
             if self.player.hand.bust():
-                self.in_game_message = Fore.RED + Style.BRIGHT + 'Player Hand BUST! Dealer Wins!' \
-                                       + Style.RESET_ALL
                 self.player.status = PlayerHandStatus.SplitInPlayHandTwo
-                self.player.hand.outcome = GameWinner.Dealer
                 success = False
         elif self.player.status == PlayerHandStatus.SplitInPlayHandTwo:
             self.player.split_hand.add(self.shoe.deal())
             if self.player.split_hand.bust():
-                self.in_game_message = Fore.RED + Style.BRIGHT + 'Player Split Hand BUST! Dealer Wins!' \
-                                       + Style.RESET_ALL
                 self.player.status = PlayerHandStatus.SplitEnded
-                self.player.split_hand.outcome = GameWinner.Dealer
                 success = False
         else:
             self.dealer.hand.add(self.shoe.deal())
             if self.dealer.hand.bust():
-                self.in_game_message = Fore.GREEN + Style.BRIGHT + 'Dealer BUST! Player Wins!' \
-                                       + Style.RESET_ALL
-                if not self.player.hand.bust():
-                    self.player.hand.outcome = GameWinner.Player
-
-                if not self.player.split_hand.bust():
-                    self.player.split_hand.outcome = GameWinner.Player
-
                 success = False
 
         return success
