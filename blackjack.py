@@ -9,6 +9,13 @@ class OutOfFundsException(Exception):
         super().__init__()
 
 
+class GameWinner(Enum):
+    NotSet: str = "NotSet"
+    Player: str = "Player"
+    Dealer: str = "Dealer"
+    Draw: str = "Draw"
+
+
 class PlayerHandStatus(Enum):
     InPlay: str = "InPlay"
     SplitInPlayHandOne: str = "SplitInPlayHandOne"
@@ -63,6 +70,7 @@ class Blackjack:
         self.winnings:float = 0
         self.dealer = BlackJackDealer()
         self.in_game_message = ''
+        self.winner = GameWinner.NotSet
 
     def __str__(self):
         output = '\n' * 50
@@ -160,7 +168,10 @@ class Blackjack:
 
         while entry.upper() != 'Q':
             print(self)
-            self.place_your_bets()
+
+            if entry == '':
+                self.place_your_bets()
+                self.in_game_message = ''
 
             print(self)
 
@@ -271,15 +282,20 @@ class Blackjack:
         if dealer_total < player_total <= 21:
             self.in_game_message += Fore.GREEN + Style.BRIGHT + 'Player wins{}!\n'.format(
                 split_hand_text) + Style.RESET_ALL
+            self.winner = GameWinner.Player
         elif player_total < dealer_total <= 21:
             self.in_game_message += Fore.BLUE + Style.BRIGHT + 'Dealer wins{}!\n'.format(split_hand_text) + Style.RESET_ALL
+            self.winner = GameWinner.Dealer
         elif player_total > 21:
             self.in_game_message += Fore.BLUE + Style.BRIGHT + 'Dealer wins{}!\n'.format(split_hand_text) + Style.RESET_ALL
+            self.winner = GameWinner.Dealer
         elif dealer_total > 21:
             self.in_game_message += Fore.GREEN + Style.BRIGHT + 'Player wins{}!\n'.format(
                 split_hand_text) + Style.RESET_ALL
+            self.winner = GameWinner.Player
         else:
             self.in_game_message += Fore.BLACK + Style.BRIGHT + 'No winner{}\n'.format(split_hand_text) + Style.RESET_ALL
+            self.winner = GameWinner.Draw
 
     def check_winner(self) -> None:
         """Check if player or dealer is the winner"""
@@ -293,6 +309,12 @@ class Blackjack:
         if self.player.status in (PlayerHandStatus.SplitInPlayHandOne, PlayerHandStatus.SplitInPlayHandTwo,
                                   PlayerHandStatus.SplitEnded):
             self.winner_messaging(self.total_hand(self.player.split_hand.cards), dealer_total, True)
+
+        if self.winner == GameWinner.Player:
+            self.calculate_winnings()
+
+    def calculate_winnings(self):
+        self.player.wallet += self.bet * 2
 
 
 if __name__ == "__main__":
