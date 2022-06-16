@@ -18,7 +18,6 @@ class Blackjack:
         self.winnings:float = 0
         self.dealer = BlackJackDealer()
         self.in_game_message = ''
-        self.winner = GameWinner.NotSet
 
     def __str__(self):
         output = '\n' * 50
@@ -203,9 +202,10 @@ class Blackjack:
 
         return success
 
-    def winner_messaging(self, player_total: int, dealer_total: int, split_hand:bool = False):
+    def winner_outcome_and_messaging(self, player_total: int, dealer_total, split_hand:bool = False) -> str:
         """Apply messaging to gaem for game outcome"""
         split_hand_text = ''
+        outcome = GameWinner.NotSet
 
         if self.player.status in (PlayerHandStatus.SplitInPlayHandOne, PlayerHandStatus.SplitInPlayHandTwo,
                                   PlayerHandStatus.SplitEnded):
@@ -217,20 +217,22 @@ class Blackjack:
         if dealer_total < player_total <= 21:
             self.in_game_message += Fore.GREEN + Style.BRIGHT + 'Player wins{}!\n'.format(
                 split_hand_text) + Style.RESET_ALL
-            self.winner = GameWinner.Player
+            outcome = GameWinner.Player
         elif player_total < dealer_total <= 21:
             self.in_game_message += Fore.BLUE + Style.BRIGHT + 'Dealer wins{}!\n'.format(split_hand_text) + Style.RESET_ALL
-            self.winner = GameWinner.Dealer
+            outcome = GameWinner.Dealer
         elif player_total > 21:
             self.in_game_message += Fore.BLUE + Style.BRIGHT + 'Dealer wins{}!\n'.format(split_hand_text) + Style.RESET_ALL
-            self.winner = GameWinner.Dealer
+            outcome = GameWinner.Dealer
         elif dealer_total > 21:
             self.in_game_message += Fore.GREEN + Style.BRIGHT + 'Player wins{}!\n'.format(
                 split_hand_text) + Style.RESET_ALL
-            self.winner = GameWinner.Player
+            outcome = GameWinner.Player
         else:
             self.in_game_message += Fore.BLACK + Style.BRIGHT + 'No winner{}\n'.format(split_hand_text) + Style.RESET_ALL
-            self.winner = GameWinner.Draw
+            outcome = GameWinner.Draw
+
+        return outcome
 
     def check_winner(self) -> None:
         """Check if player or dealer is the winner"""
@@ -239,18 +241,37 @@ class Blackjack:
         player_total = self.player.hand.total()
 
         self.in_game_message = ''
-        self.winner_messaging(player_total, dealer_total)
+        self.player.hand.outcome = self.winner_outcome_and_messaging(player_total, dealer_total)
 
         if self.player.status in (PlayerHandStatus.SplitInPlayHandOne, PlayerHandStatus.SplitInPlayHandTwo,
                                   PlayerHandStatus.SplitEnded):
-            self.winner_messaging(self.player.split_hand.total(), dealer_total, True)
+            self.player.split_hand.outcome = self.winner_outcome_and_messaging(self.player.split_hand.total(), dealer_total, True)
 
-        if self.winner == GameWinner.Player:
+        if self.player.hand.outcome in(GameWinner.Player, GameWinner.Draw) or \
+           self.player.split_hand.outcome in(GameWinner.Player, GameWinner.Draw):
             self.calculate_winnings()
 
     def calculate_winnings(self):
         """Calculate winnings for Player"""
-        self.player.wallet += self.bet * 2
+
+        if not self.player.hand.outcome == GameWinner.Draw:
+            # Blackjack pays 3 to 2
+            if self.player.hand.blackjack():
+                self.player.wallet += (self.bet * (3 / 2))
+            else:
+                self.player.wallet += self.bet * 2
+        else:
+            self.player.wallet += self.bet
+
+        if not self.player.split_hand.outcome == GameWinner.NotSet:
+            if not self.player.split_hand.outcome == GameWinner.Draw:
+                # Blackjack pays 3 to 2
+                if self.player.split_hand.blackjack():
+                    self.player.wallet += (self.bet * (3 / 2))
+                else:
+                    self.player.wallet += self.bet * 2
+            else:
+                self.player.wallet += self.bet
 
 
 if __name__ == "__main__":

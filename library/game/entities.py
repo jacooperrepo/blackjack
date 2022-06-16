@@ -1,13 +1,14 @@
 """Entities for the blackjack game"""
 from library.card.entities import CardCollection
 from library.card.enums import CardValue
-from library.game.enums import PlayerHandStatus
+from library.game.enums import PlayerHandStatus, GameWinner
 
 
 class Hand(CardCollection):
     """Collection of cards for a hand in a card game"""
     def __init__(self):
         super().__init__([])
+        self.outcome = GameWinner.NotSet
 
     def blackjack(self) -> bool:
         """Return True or False if the hand is blackjack"""
@@ -49,6 +50,11 @@ class Hand(CardCollection):
                 total -= 10
 
         return total
+
+    def reset(self) -> None:
+        """Regenerate the deck of cards"""
+        super().reset()
+        self.outcome = GameWinner.NotSet
 
 
 class Player:
