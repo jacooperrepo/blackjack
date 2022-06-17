@@ -21,10 +21,24 @@ class Blackjack:
         self.bet:float = 0
         self.split_bet:float = 0
         self.dealer = Player()
+        self.game_rules = self.get_rules()
         self.in_game_message = ''
+
+    @staticmethod
+    def get_rules() -> str:
+        """Get the rules text for the game"""
+        rules = ''
+        try:
+            with open('./library/game/rules/blackjack.txt', 'r') as f:
+                rules = f.read()
+        except IOError:
+            pass
+
+        return rules
 
     def __str__(self):
         output = '\n' * 50
+        output += Fore.LIGHTBLACK_EX + self.game_rules + Style.RESET_ALL + '\n\n'
         output += Fore.BLACK + Style.RESET_ALL + "wallet:\t$" + \
                   str(round(self.player.wallet, 2)) + "\n"
         output += Fore.LIGHTRED_EX + Style.NORMAL + "bet:\t$" + str(round(self.bet, 2)) + "\n"
@@ -299,6 +313,18 @@ class FaceUp21(Blackjack):
         self.game_name = self.game_color + '-' * 16 + 'Face Up 21' + '-' * 15 + '\n' \
                          + Style.RESET_ALL
 
+    @staticmethod
+    def get_rules() -> str:
+        """Get the rules text for the game"""
+        rules = ''
+        try:
+            with open('./library/game/rules/faceup21.txt', 'r') as f:
+                rules = f.read()
+        except IOError:
+            pass
+
+        return rules
+
     def play(self) -> None:
         """Game logic to run the game"""
         keep_playing = ''
@@ -329,6 +355,18 @@ class Spanish21(Blackjack):
                          + Style.RESET_ALL
         self.remove_tens()
         self.shoe.notifier.subscribe("reset", self.remove_tens)
+
+    @staticmethod
+    def get_rules() -> str:
+        """Get the rules text for the game"""
+        rules = ''
+        try:
+            with open('./library/game/rules/spanish21.txt', 'r') as f:
+                rules = f.read()
+        except IOError:
+            pass
+
+        return rules
 
     def remove_tens(self):
         """Spanish 21 does not have 10s"""
