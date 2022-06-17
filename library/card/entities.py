@@ -1,6 +1,8 @@
 """Playing deck and blackjack entities"""
 from random import shuffle
 from colorama import Fore, Style
+from EventNotifier import Notifier
+
 from library.card.enums import CardSuit, CardValue
 
 
@@ -149,9 +151,12 @@ class Shoe(CardCollection):
         super().__init__(self.generate_shoe())
         self.shuffle_cards()
 
+        self.notifier = Notifier(["reset"])
+
     def reset(self) -> None:
         """Regenerate the deck of blackjack"""
         self.cards = self.generate_shoe()
+        self.notifier.raise_event("reset")
 
     def generate_shoe(self) -> []:
         """Generate new shoe with specified number of decks"""
