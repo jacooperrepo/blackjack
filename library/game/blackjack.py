@@ -8,8 +8,7 @@ from library.exceptions.game import OutOfFundsException
 
 
 class Blackjack:
-    """Blackjack game class
-    Like traditional blackjack, the dealer hits on 16 and stands on 17. """
+    """Blackjack game class"""
     def __init__(self, shoe_size: int = 1, wallet_amount:float = 100):
         self.game_name = Fore.GREEN + Style.BRIGHT + '-'*16 + 'Blackjack' + '-'*16 + '\n' \
                   + Style.RESET_ALL
@@ -291,12 +290,7 @@ class Blackjack:
 
 
 class FaceUp21(Blackjack):
-    """In this version of the game, both of the dealer’s cards are dealt and shown face up.
-       It goes without saying that being able to see two cards instead of just one gives gamblers
-       tremendous insight into how they should be betting during the hand.
-       Unfortunately, it isn’t all good news for gamblers when it comes to this game. For example,
-       a dealer hits on soft 17, and dealer blackjack beats a player blackjack, and blackjack only pays even money.
-       Similar to European blackjack, in Face Up 21 players can only double down on 9, 10, and 11."""
+    """Face Up 21, a variation of Blackjack. See readme for rules"""
     def __init__(self, shoe_size: int = 1, wallet_amount: float = 100):
         super().__init__(shoe_size, wallet_amount)
         self.game_name = Fore.BLUE + Style.BRIGHT + '-' * 16 + 'Face Up 21' + '-' * 15 + '\n' \
@@ -324,15 +318,7 @@ class FaceUp21(Blackjack):
 
 
 class Spanish21(Blackjack):
-    """A five-card 21 pays out at 3:2.
-       A Six-card 21 pays 2:1
-       A seven-card 21 pays out at 3:1.
-       A 678 and 777 of mixed suit pays 3:2. If they’re the same suit it pays 2:1.
-       If a player has 777 of the same suit and the dealer is holding a 7 in any suit, there is a $1,000 bonus paid to the player.
-       If the player has bet more than $25 at the start of the hand, this climbs all the way to $5,000.
-       Blackjack (a natural total of 21 on the first two cards) always wins, and is always paid 3:2 regardless of whether or not the dealer
-       has a blackjack.
-       Like traditional blackjack, the dealer hits on 16 and stands on 17."""
+    """Spanish 21, a variation of Blackjack. See readme for rules"""
     def __init__(self, shoe_size: int = 1, wallet_amount: float = 100):
         super().__init__(shoe_size, wallet_amount)
         self.game_name = Fore.RED + Style.BRIGHT + '-' * 16 + 'Spanish 21' + '-' * 15 + '\n' \
