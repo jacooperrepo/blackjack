@@ -128,3 +128,144 @@ def test_spanish_21_deck_creation():
 
     assert len(game.shoe.cards) == 240
     assert len(list(found_cards)) == 0
+
+
+def test_spanish_21_calculate_winnings():
+    game = Spanish21(1, 0)
+
+    game.player.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.TEN, CardSuit.SPADES))
+
+    # Blackjack pays 3/2
+    game.bet = 10
+    game.calculate_winnings()
+    assert game.player.wallet == 15
+
+    game.reset()
+    game.player.wallet = 0
+
+    # A five-card 21 pays out at 3:2
+    game.player.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.TEN, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.EIGHT, CardSuit.SPADES))
+    game.bet = 10
+    game.calculate_winnings()
+    assert game.player.wallet == 15
+
+    game.reset()
+    game.player.wallet = 0
+
+    # A Six-card 21 pays 2:1
+    game.player.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.TEN, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
+    game.bet = 10
+    game.calculate_winnings()
+    assert game.player.wallet == 20
+
+    game.reset()
+    game.player.wallet = 0
+
+    # A seven-card 21 pays out at 3:1
+    game.player.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.THREE, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
+    game.bet = 10
+    game.calculate_winnings()
+    assert game.player.wallet == 30
+
+    game.reset()
+    game.player.wallet = 0
+
+    # A 678 of mixed suit pays 3:2
+    game.player.hand.add(Card(CardValue.SIX, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.SEVEN, CardSuit.DIAMONDS))
+    game.player.hand.add(Card(CardValue.EIGHT, CardSuit.SPADES))
+    game.bet = 10
+    game.calculate_winnings()
+    assert game.player.wallet == 15
+
+    game.reset()
+    game.player.wallet = 0
+
+    # A 678 same suit it pays 2:1
+    game.player.hand.add(Card(CardValue.SIX, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.EIGHT, CardSuit.SPADES))
+    game.bet = 10
+    game.calculate_winnings()
+    assert game.player.wallet == 20
+
+    game.reset()
+    game.player.wallet = 0
+
+    # A 777 of mixed suit pays 3:2
+    game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.SEVEN, CardSuit.DIAMONDS))
+    game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
+    game.bet = 10
+    game.calculate_winnings()
+    assert game.player.wallet == 15
+
+    game.reset()
+    game.player.wallet = 0
+
+    # A 777 of same suit it pays 2:1
+    game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
+    game.bet = 10
+    game.calculate_winnings()
+    assert game.player.wallet == 20
+
+    game.reset()
+    game.player.wallet = 0
+
+    # A 777 of same suit it pays 2:1
+    # If a player has 777 of the same suit and the dealer is holding a 7 in any suit,
+    # there is a $1,000 bonus paid to the player.
+    game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
+    game.dealer.hand.add(Card(CardValue.SEVEN, CardSuit.DIAMONDS))
+
+    game.bet = 10
+    game.calculate_winnings()
+    assert game.player.wallet == 1020
+
+    game.reset()
+    game.player.wallet = 0
+
+    # A 777 of same suit it pays 2:1
+    # If the player has bet more than $25 at the start of the hand, this climbs all the way to $5,000.
+    game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
+    game.dealer.hand.add(Card(CardValue.SEVEN, CardSuit.DIAMONDS))
+    game.bet = 26
+    game.calculate_winnings()
+    assert game.player.wallet == 5052
+
+    game.reset()
+    game.player.wallet = 0
+
+    # Blackjack always wins, and is always paid 3:2 regardless of whether or not the dealer has a blackjack.
+    game.player.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.TEN, CardSuit.SPADES))
+    game.dealer.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
+    game.dealer.hand.add(Card(CardValue.JACK, CardSuit.DIAMONDS))
+    game.bet = 10
+    game.calculate_winnings()
+    assert game.player.wallet == 15
+
+
+

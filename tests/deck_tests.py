@@ -1,6 +1,6 @@
 """Testing the deck of blackjack"""
 import pytest
-from library.card.entities import Shoe, Deck, Joker, Diamonds, Spades, Clubs, Hearts, CardValue, CardSuit
+from library.card.entities import Shoe, Deck, Joker, Diamonds, Spades, Clubs, Hearts, CardValue, CardSuit, Card, CardCollection
 
 
 @pytest.fixture
@@ -128,6 +128,42 @@ def test_remove_card_from_deck(player_deck):
 
     assert len(found_cards_list) == 0
     assert len(player_deck.cards) == 51
+
+
+@pytest.mark.parametrize("card1, card2, card3, expected", [
+    (Diamonds(CardValue.ACE), Diamonds(CardValue.TEN), Diamonds(CardValue.TEN), True),
+    (Spades(CardValue.ACE), Diamonds(CardValue.TEN), Diamonds(CardValue.THREE), False),
+    (Diamonds(CardValue.ACE), Diamonds(CardValue.TEN), Clubs(CardValue.EIGHT), False),
+    (Hearts(CardValue.ACE), Hearts(CardValue.TEN), Hearts(CardValue.TWO), True),
+    (Clubs(CardValue.ACE), Clubs(CardValue.TEN), Clubs(CardValue.ACE), True)])
+def test_card_collection_all_same_suite(card1, card2, card3, expected):
+    cards = CardCollection([card1, card2, card3])
+    assert cards.all_same_suit() == expected
+
+
+@pytest.mark.parametrize("card1, card2, card3, expected", [
+    (Diamonds(CardValue.ACE), Diamonds(CardValue.TEN), Diamonds(CardValue.SIX), [1, 10, 6]),
+    (Spades(CardValue.ACE), Diamonds(CardValue.TEN), Diamonds(CardValue.FOUR), [1, 10, 4]),
+    (Diamonds(CardValue.ACE), Diamonds(CardValue.TEN), Clubs(CardValue.FIVE), [1, 10, 5]),
+    (Hearts(CardValue.ACE), Hearts(CardValue.TEN), Hearts(CardValue.SEVEN), [1, 10, 7]),
+    (Clubs(CardValue.ACE), Clubs(CardValue.TEN), Clubs(CardValue.NINE), [1, 10, 9])])
+def test_card_collection_values(card1, card2, card3, expected):
+    cards = CardCollection([card1, card2, card3])
+    assert cards.values() == expected
+
+
+def test_card_collection_has_card():
+    cards = CardCollection([Diamonds(CardValue.TEN), Clubs(CardValue.SIX)])
+
+    assert cards.has_card(Diamonds(CardValue.TEN))
+    assert cards.has_card(Card(CardValue.TEN, CardSuit.DIAMONDS))
+    assert cards.has_card(CardValue.TEN)
+    assert cards.has_card(CardSuit.DIAMONDS)
+
+    assert not cards.has_card(Clubs(CardValue.TEN))
+    assert not cards.has_card(Card(CardValue.TEN, CardSuit.SPADES))
+    assert not cards.has_card(CardValue.FIVE)
+    assert not cards.has_card(CardSuit.SPADES)
 
 
 def test_shoe_creation(shoe):
