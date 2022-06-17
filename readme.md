@@ -5,6 +5,7 @@ This is the game collection class that is used to start one of the three games a
 Create a new instance of this class and call the select_game method to request player input on game selection
 
 game = BlackjackGameCollection()
+
 game.select_game()
 
 Optionally supply the shoe size (number of decks) and wallet size for the player. Defaults are 1 for shoe size and 100 for wallet amount.
