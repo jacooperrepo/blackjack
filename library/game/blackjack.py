@@ -11,7 +11,8 @@ class Blackjack:
     """Blackjack game class
     Like traditional blackjack, the dealer hits on 16 and stands on 17. """
     def __init__(self, shoe_size: int = 1, wallet_amount:float = 100):
-        self.game_name = "Blackjack"
+        self.game_name = Fore.GREEN + Style.BRIGHT + '-'*16 + 'Blackjack' + '-'*16 + '\n' \
+                  + Style.RESET_ALL
         self.shoe_size = shoe_size
         self.shoe = Shoe(shoe_size)
         self.player = BlackJackPlayer()
@@ -29,8 +30,7 @@ class Blackjack:
         if self.split_bet > 0:
             output += Fore.LIGHTRED_EX + Style.NORMAL + "split bet: $" + \
                       str(round(self.split_bet, 2)) + "\n"
-        output += Fore.GREEN + Style.BRIGHT + '-'*16 + self.game_name + '-'*16 + '\n' \
-                  + Style.RESET_ALL
+        output += self.game_name
         if self.player.status in(PlayerHandStatus.ENDED, PlayerHandStatus.SPLIT_ENDED):
             output += Fore.BLACK + Style.BRIGHT + '* '
         else:
@@ -57,8 +57,8 @@ class Blackjack:
         else:
             output += ' '.join(str(card) for card in self.player.hand.cards)
 
-        output += Fore.GREEN + Style.BRIGHT + '\n' + '-'*41 + '\n' + Style.RESET_ALL
-        output += Fore.GREEN + Style.NORMAL + 'blackjack pays (3/2)\n' + Style.RESET_ALL
+        output += Fore.LIGHTBLACK_EX + Style.BRIGHT + '\n' + '-'*41 + '\n' + Style.RESET_ALL
+        output += Fore.LIGHTBLUE_EX + Style.NORMAL + 'blackjack pays (3/2)\n' + Style.RESET_ALL
         output += 'remaining cards: {}'.format(self.shoe.remaining())
         output += '\n'
         output += self.in_game_message
@@ -299,7 +299,8 @@ class FaceUp21(Blackjack):
        Similar to European blackjack, in Face Up 21 players can only double down on 9, 10, and 11."""
     def __init__(self, shoe_size: int = 1, wallet_amount: float = 100):
         super().__init__(shoe_size, wallet_amount)
-        self.game_name = "Face Up 21"
+        self.game_name = Fore.BLUE + Style.BRIGHT + '-' * 16 + 'Face Up 21' + '-' * 15 + '\n' \
+                         + Style.RESET_ALL
 
     def play(self) -> None:
         """Game logic to run the game"""
@@ -334,8 +335,34 @@ class Spanish21(Blackjack):
        Like traditional blackjack, the dealer hits on 16 and stands on 17."""
     def __init__(self, shoe_size: int = 1, wallet_amount: float = 100):
         super().__init__(shoe_size, wallet_amount)
-        self.game_name = "Spanish 21"
+        self.game_name = Fore.RED + Style.BRIGHT + '-' * 16 + 'Spanish 21' + '-' * 15 + '\n' \
+                         + Style.RESET_ALL
         self.shoe.remove(Diamonds(CardValue.TEN))
         self.shoe.remove(Hearts(CardValue.TEN))
         self.shoe.remove(Clubs(CardValue.TEN))
         self.shoe.remove(Spades(CardValue.TEN))
+
+
+class BlackjackGameCollection:
+    def __init__(self, shoe_size: int = 1, wallet_amount: float = 100):
+        self.games = (Blackjack, FaceUp21, Spanish21)
+        self.size = shoe_size
+        self.wallet_amount = wallet_amount
+
+    def select_game(self):
+        game_selection = -1
+
+        while not(0 <= game_selection <=2):
+            player_input = input('Select a game to play\n\n1\tBlackjack\n2\tFace Up 21\n3\tSpanish 21\n')
+            try:
+                game_selection = int(player_input) - 1
+            except ValueError:
+                continue
+
+        self.play(game_selection)
+
+    def play(self, game_selection:int = 0):
+        self.games[game_selection](self.size, self.wallet_amount).play()
+
+
+
