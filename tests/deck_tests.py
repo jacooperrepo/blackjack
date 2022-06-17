@@ -148,5 +148,6 @@ def test_shoe_reset():
     shoe = Shoe(2)
     assert shoe.remaining() == 104
 
-    shoe.reset(3)
-    assert len(shoe.cards) == 156
+    shoe.deal()
+    shoe.reset()
+    assert len(shoe.cards) == 104

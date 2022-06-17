@@ -1,5 +1,5 @@
 import pytest
-from library.game.blackjack import Blackjack
+from library.game.blackjack import Blackjack, Spanish21
 from library.card.entities import Card
 from library.card.enums import CardSuit, CardValue
 from library.game.enums import PlayerHandStatus
@@ -112,3 +112,19 @@ def test_blackjack_hand(card1, card2, expected):
     hand.add(card1)
     hand.add(card2)
     assert hand.blackjack() == expected
+
+
+def test_spanish_21_deck_creation():
+    game = Spanish21(5)
+
+    found_cards = filter(lambda card: card.value == CardValue.TEN, game.shoe.cards)
+
+    assert len(game.shoe.cards) == 240
+    assert len(list(found_cards)) == 0
+
+    game.shoe.reset()
+
+    found_cards = filter(lambda card: card.value == CardValue.TEN, game.shoe.cards)
+
+    assert len(game.shoe.cards) == 240
+    assert len(list(found_cards)) == 0

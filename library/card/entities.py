@@ -1,6 +1,8 @@
 """Playing deck and blackjack entities"""
 from random import shuffle
 from colorama import Fore, Style
+from EventNotifier import Notifier
+
 from library.card.enums import CardSuit, CardValue
 
 
@@ -85,18 +87,27 @@ class CardCollection:
         """Add a card to the deck"""
         self.cards.append(card)
 
-    def remove(self, card: Card) -> None:
+    def remove(self, card: Card) -> bool:
         """Remove a card from the deck"""
-        for remove_card in filter(lambda target: target.value == card.value \
-                                  and target.suit == card.suit, self.cards):
-            self.cards.remove(remove_card)
+        try:
+            for remove_card in filter(lambda target: target.value == card.value \
+                                      and target.suit == card.suit, self.cards):
+                self.cards.remove(remove_card)
+        except ValueError:
+            return False
+        else:
+            return True
 
     def total(self) -> int:
-        """Total up blackjack in collection"""
+        """Total up card value in collection"""
         total = 0
         for card in self.cards:
             total += card.numerical_value()
         return total
+
+    def remaining(self) -> int:
+        """Return remaining blackjack in deck"""
+        return len(self.cards)
 
     def reset(self) -> None:
         """Regenerate the deck of blackjack"""
@@ -117,7 +128,7 @@ class Deck(CardCollection):
         self.cards = self.generate_deck(self.has_joker)
 
     @staticmethod
-    def generate_deck(with_joker: bool) -> list:
+    def generate_deck(with_joker: bool) -> []:
         """Generate new pack of 52 blackjack"""
         deck = []
 
@@ -133,34 +144,27 @@ class Deck(CardCollection):
         return deck
 
 
-class Shoe:
+class Shoe(CardCollection):
     """A shoe containing multiple decks"""
-
     def __init__(self, size:int = 1):
-        self.cards = []
         self.size = size
-        self.generate_shoe()
+        super().__init__(self.generate_shoe())
+        self.shuffle_cards()
 
-    def generate_shoe(self):
+        self.notifier = Notifier(["reset"])
+
+    def reset(self) -> None:
+        """Regenerate the deck of blackjack"""
+        self.cards = self.generate_shoe()
+        self.notifier.raise_event("reset")
+
+    def generate_shoe(self) -> []:
         """Generate new shoe with specified number of decks"""
         shoe = []
 
-        for _ in range(0, self.size):
-            for card in Deck().cards:
-                shoe.append(card)
+        for deck in [Deck() for _ in range(0, self.size)]:
+            shoe += deck.cards
 
-        shuffle(shoe)
-        self.cards = shoe
+        return shoe
 
-    def deal(self) -> Card:
-        """Deal one card from the shoe"""
-        return self.cards.pop()
 
-    def remaining(self) -> int:
-        """Return remaining blackjack in shoe"""
-        return len(self.cards)
-
-    def reset(self, size: int = 1):
-        """Reset shoe to desired deck count"""
-        self.size = size
-        self.generate_shoe()

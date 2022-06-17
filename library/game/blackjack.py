@@ -1,6 +1,9 @@
-"""Blackjack card game"""
+"""Blackjack card game
+   https://www.bestuscasinos.org/blog/understanding-5-different-forms-of-blackjack/"""
 from colorama import Fore, Style
-from library.card.entities import Shoe
+from EventNotifier import Notifier
+
+from library.card.entities import Shoe, Diamonds, Clubs, Spades, Hearts, CardValue
 from library.game.entities import BlackJackPlayer, Player
 from library.game.enums import GameWinner, PlayerHandStatus
 from library.exceptions.game import OutOfFundsException
@@ -8,8 +11,9 @@ from library.exceptions.game import OutOfFundsException
 
 class Blackjack:
     """Blackjack game class"""
-
     def __init__(self, shoe_size: int = 1, wallet_amount:float = 100):
+        self.game_name = Fore.GREEN + Style.BRIGHT + '-'*16 + 'Blackjack' + '-'*16 + '\n' \
+                  + Style.RESET_ALL
         self.shoe_size = shoe_size
         self.shoe = Shoe(shoe_size)
         self.player = BlackJackPlayer()
@@ -27,8 +31,7 @@ class Blackjack:
         if self.split_bet > 0:
             output += Fore.LIGHTRED_EX + Style.NORMAL + "split bet: $" + \
                       str(round(self.split_bet, 2)) + "\n"
-        output += Fore.GREEN + Style.BRIGHT + '-'*16 + 'Blackjack' + '-'*16 + '\n' \
-                  + Style.RESET_ALL
+        output += self.game_name
         if self.player.status in(PlayerHandStatus.ENDED, PlayerHandStatus.SPLIT_ENDED):
             output += Fore.BLACK + Style.BRIGHT + '* '
         else:
@@ -55,8 +58,8 @@ class Blackjack:
         else:
             output += ' '.join(str(card) for card in self.player.hand.cards)
 
-        output += Fore.GREEN + Style.BRIGHT + '\n' + '-'*41 + '\n' + Style.RESET_ALL
-        output += Fore.GREEN + Style.NORMAL + 'blackjack pays (3/2)\n' + Style.RESET_ALL
+        output += Fore.LIGHTBLACK_EX + Style.BRIGHT + '\n' + '-'*41 + '\n' + Style.RESET_ALL
+        output += Fore.LIGHTBLUE_EX + Style.NORMAL + 'blackjack pays (3/2)\n' + Style.RESET_ALL
         output += 'remaining cards: {}'.format(self.shoe.remaining())
         output += '\n'
         output += self.in_game_message
@@ -112,7 +115,7 @@ class Blackjack:
                 except ValueError:
                     pass
 
-        if self.player.wallet - valid_bet < 0:
+        if self.player.wallet - valid_bet < 0 or valid_bet < 0:
             self.place_your_bets()
         else:
             self.player.wallet -= valid_bet
@@ -168,7 +171,7 @@ class Blackjack:
                 self.in_game_message = Fore.BLUE + Style.BRIGHT + 'Dealer wins!' + Style.RESET_ALL
                 break
             elif entry.upper() == 'R':  # Reset deck
-                self.shoe = Shoe(self.shoe_size)
+                self.shoe.reset()
             elif entry.upper() == 'X':  # Split
                 if len(self.player.hand.cards) == 2:
                     if self.player.hand.cards[0].value == self.player.hand.cards[1].value:
@@ -286,3 +289,131 @@ class Blackjack:
                     self.player.wallet += self.split_bet * 2
             else:
                 self.player.wallet += self.split_bet
+
+
+class FaceUp21(Blackjack):
+    """Face Up 21, a variation of Blackjack. See readme for rules"""
+    def __init__(self, shoe_size: int = 1, wallet_amount: float = 100):
+        super().__init__(shoe_size, wallet_amount)
+        self.game_name = Fore.BLUE + Style.BRIGHT + '-' * 16 + 'Face Up 21' + '-' * 15 + '\n' \
+                         + Style.RESET_ALL
+
+    def play(self) -> None:
+        """Game logic to run the game"""
+        keep_playing = ''
+
+        try:
+            while keep_playing != 'Q':
+                self.dealer.hand.add(self.shoe.deal())
+                self.dealer.hand.add(self.shoe.deal())
+                self.player.hand.add(self.shoe.deal())
+
+                keep_playing = self.process_input()
+                print(self)
+
+                self.reset()
+
+        except IndexError:
+            print(Fore.RED + Style.BRIGHT + 'Out of cards' + Style.RESET_ALL)
+        except OutOfFundsException:
+            print(Fore.RED + Style.BRIGHT + 'Out of funds' + Style.RESET_ALL)
+
+
+class Spanish21(Blackjack):
+    """Spanish 21, a variation of Blackjack. See readme for rules"""
+    def __init__(self, shoe_size: int = 1, wallet_amount: float = 100):
+        super().__init__(shoe_size, wallet_amount)
+        self.game_name = Fore.RED + Style.BRIGHT + '-' * 16 + 'Spanish 21' + '-' * 15 + '\n' \
+                         + Style.RESET_ALL
+        self.remove_tens()
+        self.shoe.notifier.subscribe("reset", self.remove_tens)
+
+    def remove_tens(self):
+        self.shoe.remove(Diamonds(CardValue.TEN))
+        self.shoe.remove(Hearts(CardValue.TEN))
+        self.shoe.remove(Clubs(CardValue.TEN))
+        self.shoe.remove(Spades(CardValue.TEN))
+
+    def winner_outcome_and_messaging(self, player_total:
+                                     int, dealer_total, split_hand:bool = False) -> str:
+        """Apply messaging to gaem for game outcome"""
+        split_hand_text = ''
+        outcome = GameWinner.NOTSET
+
+        if self.player.status in (PlayerHandStatus.SPLIT_IN_PLAY_HAND_ONE,
+                                  PlayerHandStatus.SPLIT_IN_PLAY_HAND_TWO,
+                                  PlayerHandStatus.SPLIT_ENDED):
+            if not split_hand:
+                split_hand_text = " Hand 1"
+            else:
+                split_hand_text = " Hand 2"
+
+        if dealer_total < player_total <= 21:
+            self.in_game_message += Fore.GREEN + Style.BRIGHT + 'Player wins{}!\n'.format(
+                split_hand_text) + Style.RESET_ALL
+            outcome = GameWinner.PLAYER
+        elif player_total < dealer_total <= 21:
+            self.in_game_message += Fore.BLUE + Style.BRIGHT + \
+                                    'Dealer wins{}!\n'.format(split_hand_text) + Style.RESET_ALL
+            outcome = GameWinner.DEALER
+        elif player_total > 21:
+            self.in_game_message += Fore.BLUE + Style.BRIGHT + \
+                                    'Dealer wins{}!\n'.format(split_hand_text) + Style.RESET_ALL
+            outcome = GameWinner.DEALER
+        elif dealer_total > 21:
+            self.in_game_message += Fore.GREEN + Style.BRIGHT + 'Player wins{}!\n'.format(
+                split_hand_text) + Style.RESET_ALL
+            outcome = GameWinner.PLAYER
+        else:
+            self.in_game_message += Fore.BLACK + Style.BRIGHT + \
+                                    'No winner{}\n'.format(split_hand_text) + Style.RESET_ALL
+            outcome = GameWinner.DRAW
+
+        return outcome
+
+    def calculate_winnings(self):
+        """Calculate winnings for Player"""
+
+        if self.player.hand.outcome != GameWinner.DRAW:
+            # Blackjack pays 3 to 2
+            if self.player.hand.blackjack():
+                self.player.wallet += (self.bet * (3 / 2))
+            else:
+                self.player.wallet += self.bet * 2
+        else:
+            self.player.wallet += self.bet
+
+        if self.player.split_hand.outcome != GameWinner.NOTSET:
+            if self.player.split_hand.outcome != GameWinner.DRAW:
+                # Blackjack pays 3 to 2
+                if self.player.split_hand.blackjack():
+                    self.player.wallet += (self.split_bet * (3 / 2))
+                else:
+                    self.player.wallet += self.split_bet * 2
+            else:
+                self.player.wallet += self.split_bet
+
+
+class BlackjackGameCollection:
+    def __init__(self, shoe_size: int = 1, wallet_amount: float = 100):
+        self.games = (Blackjack, FaceUp21, Spanish21)
+        self.size = shoe_size
+        self.wallet_amount = wallet_amount
+
+    def select_game(self):
+        game_selection = -1
+
+        while not(0 <= game_selection <=2):
+            player_input = input('Select a game to play\n\n1\tBlackjack\n2\tFace Up 21\n3\tSpanish 21\n')
+            try:
+                game_selection = int(player_input) - 1
+            except ValueError:
+                continue
+
+        self.play(game_selection)
+
+    def play(self, game_selection:int = 0):
+        self.games[game_selection](self.size, self.wallet_amount).play()
+
+
+
