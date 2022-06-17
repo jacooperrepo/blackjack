@@ -8,6 +8,7 @@ from library.card.enums import CardSuit, CardValue
 
 class Card:
     """Generic card"""
+
     def __init__(self, value, suit):
         self.suit = suit
         self.value = value
@@ -18,7 +19,7 @@ class Card:
             card_num_value = 0
         elif self.value is CardValue.ACE:
             card_num_value = 1
-        elif self.value in(CardValue.JACK, CardValue.QUEEN, CardValue.KING):
+        elif self.value in (CardValue.JACK, CardValue.QUEEN, CardValue.KING):
             card_num_value = 10
         else:
             card_num_value = int(self.value.value)
@@ -27,52 +28,58 @@ class Card:
 
 class Joker(Card):
     """Joker card"""
+
     def __init__(self):
         super().__init__(CardValue.JOKER, CardSuit.JOKER)
 
     def __str__(self):
-        return  f"{Fore.GREEN + Style.BRIGHT}🃏{self.value.value}" + Style.RESET_ALL
+        return f"{Fore.GREEN + Style.BRIGHT}🃏{self.value.value}" + Style.RESET_ALL
 
 
 class Diamonds(Card):
     """Diamonds suit card"""
+
     def __init__(self, value):
         super().__init__(value, CardSuit.DIAMONDS)
 
     def __str__(self):
-        return  f"{Fore.RED + Style.BRIGHT}♦{self.value.value}" + Style.RESET_ALL
+        return f"{Fore.RED + Style.BRIGHT}♦{self.value.value}" + Style.RESET_ALL
 
 
 class Hearts(Card):
     """Hearts suit card"""
+
     def __init__(self, value):
         super().__init__(value, CardSuit.HEARTS)
 
     def __str__(self):
-        return  f"{Fore.RED + Style.BRIGHT}♥{self.value.value}" + Style.RESET_ALL
+        return f"{Fore.RED + Style.BRIGHT}♥{self.value.value}" + Style.RESET_ALL
 
 
 class Clubs(Card):
     """Clubs suit card"""
+
     def __init__(self, value):
         super().__init__(value, CardSuit.CLUBS)
 
     def __str__(self):
-        return  f"{Fore.BLACK + Style.BRIGHT}♣︎{self.value.value}" + Style.RESET_ALL
+        return f"{Fore.BLACK + Style.BRIGHT}♣︎{self.value.value}" + Style.RESET_ALL
 
 
 class Spades(Card):
     """Spades suit card"""
+
     def __init__(self, value):
         super().__init__(value, CardSuit.SPADES)
 
     def __str__(self):
-        return  f"{Fore.BLACK + Style.BRIGHT}♠{self.value.value}" + Style.RESET_ALL
+        return f"{Fore.BLACK + Style.BRIGHT}♠{self.value.value}" + Style.RESET_ALL
 
 
 class CardCollection:
     """Collection of blackjack and associated logic"""
-    def __init__(self, cards:[]):
+
+    def __init__(self, cards: []):
         self.cards = cards
 
     def shuffle_cards(self) -> None:
@@ -91,7 +98,7 @@ class CardCollection:
         """Remove a card from the deck"""
         try:
             for remove_card in filter(lambda target: target.value == card.value \
-                                      and target.suit == card.suit, self.cards):
+                                                     and target.suit == card.suit, self.cards):
                 self.cards.remove(remove_card)
         except ValueError:
             return False
@@ -113,9 +120,66 @@ class CardCollection:
         """Regenerate the deck of blackjack"""
         self.cards = []
 
+    def has_card(self, *args) -> bool:
+        """Remove a card from the deck"""
+        card = None
+        card_suit = None
+        card_value = None
+
+        exists = False
+
+        for arg in args:
+            if type(arg) == Card:
+                card = arg
+                break
+            elif type(arg) == CardSuit:
+                card_suit = arg
+            elif type(arg) == CardValue:
+                card_value = arg
+
+        if card is not None:
+            exists = len(list(filter(lambda target: target.value == card.value \
+                                           and target.suit == card.suit, self.cards))) > 0
+        elif card_suit is not None and card_value is not None:
+            exists = len(list(filter(lambda target: target.value == card_value.value \
+                                                    and target.suit == card_suit.suit, self.cards))) > 0
+        elif card_suit is not None:
+            exists = len(list(filter(lambda target: target.suit == card_suit.suit, self.cards))) > 0
+        elif card_value is not None:
+            exists = len(list(filter(lambda target: target.value == card_value.value, self.cards))) > 0
+
+        return exists
+
+    def all_same_suit(self) -> bool:
+        diamonds_count = 0
+        clubs_count = 0
+        spades_count = 0
+        hearts_count = 0
+        card_in_collection = len(self.cards)
+
+        diamonds_count = len(list(filter(lambda target: target.suit == CardSuit.DIAMONDS, self.cards)))
+        clubs_count = len(list(filter(lambda target: target.suit == CardSuit.CLUBS, self.cards)))
+        spades_count = len(list(filter(lambda target: target.suit == CardSuit.SPADES, self.cards)))
+        hearts_count = len(list(filter(lambda target: target.suit == CardSuit.HEARTS, self.cards)))
+
+        if diamonds_count == card_in_collection or clubs_count == card_in_collection or \
+                spades_count == card_in_collection or hearts_count == card_in_collection:
+            return True
+
+        return False
+
+    def values(self) -> []:
+        """Return a tuple of all card values"""
+        values = []
+        for card in self.cards:
+            values.append(card.numerical_value())
+
+        return values
+
 
 class Deck(CardCollection):
     """Playing deck of blackjack"""
+
     def __init__(self, with_joker: bool = False, shuffle_cards: bool = False):
         super().__init__(self.generate_deck(with_joker))
 
@@ -146,7 +210,8 @@ class Deck(CardCollection):
 
 class Shoe(CardCollection):
     """A shoe containing multiple decks"""
-    def __init__(self, size:int = 1):
+
+    def __init__(self, size: int = 1):
         self.size = size
         super().__init__(self.generate_shoe())
         self.shuffle_cards()
@@ -166,5 +231,3 @@ class Shoe(CardCollection):
             shoe += deck.cards
 
         return shoe
-
-

@@ -329,67 +329,61 @@ class Spanish21(Blackjack):
         self.shoe.notifier.subscribe("reset", self.remove_tens)
 
     def remove_tens(self):
+        """Spanish 21 does not have 10s"""
         self.shoe.remove(Diamonds(CardValue.TEN))
         self.shoe.remove(Hearts(CardValue.TEN))
         self.shoe.remove(Clubs(CardValue.TEN))
         self.shoe.remove(Spades(CardValue.TEN))
 
-    def winner_outcome_and_messaging(self, player_total:
-                                     int, dealer_total, split_hand:bool = False) -> str:
-        """Apply messaging to gaem for game outcome"""
-        split_hand_text = ''
-        outcome = GameWinner.NOTSET
+    def apply_odds(self, hand):
+        """Apply odds"""
 
-        if self.player.status in (PlayerHandStatus.SPLIT_IN_PLAY_HAND_ONE,
-                                  PlayerHandStatus.SPLIT_IN_PLAY_HAND_TWO,
-                                  PlayerHandStatus.SPLIT_ENDED):
-            if not split_hand:
-                split_hand_text = " Hand 1"
-            else:
-                split_hand_text = " Hand 2"
+        values = hand.values()
 
-        if dealer_total < player_total <= 21:
-            self.in_game_message += Fore.GREEN + Style.BRIGHT + 'Player wins{}!\n'.format(
-                split_hand_text) + Style.RESET_ALL
-            outcome = GameWinner.PLAYER
-        elif player_total < dealer_total <= 21:
-            self.in_game_message += Fore.BLUE + Style.BRIGHT + \
-                                    'Dealer wins{}!\n'.format(split_hand_text) + Style.RESET_ALL
-            outcome = GameWinner.DEALER
-        elif player_total > 21:
-            self.in_game_message += Fore.BLUE + Style.BRIGHT + \
-                                    'Dealer wins{}!\n'.format(split_hand_text) + Style.RESET_ALL
-            outcome = GameWinner.DEALER
-        elif dealer_total > 21:
-            self.in_game_message += Fore.GREEN + Style.BRIGHT + 'Player wins{}!\n'.format(
-                split_hand_text) + Style.RESET_ALL
-            outcome = GameWinner.PLAYER
+        # Blackjack always wins, and is always paid 3:2 regardless of whether or not the dealer has a blackjack.
+        if hand.blackjack():
+            self.player.wallet += (self.bet * (3 / 2))
+        elif hand.total() == 21 and len(hand.cards) == 5:
+            # A five-card 21 pays out at 3:2
+            self.player.wallet += (self.bet * (3 / 2))
+        elif hand.total() == 21 and len(hand.cards) == 6:
+            # A Six-card 21 pays 2:1
+            self.player.wallet += (self.bet * (2 / 1))
+        elif hand.total() == 21 and len(hand.cards) == 7:
+            # A seven-card 21 pays out at 3:1.
+            self.player.wallet += (self.bet * (3 / 1))
+        elif len(hand.cards) == 3 and hand.all_same_suit() and values.count(7) == 3:
+            # 777 of same suit pays 2:1
+            self.player.wallet += (self.bet * (2 / 1))
+            # If a player has 777 of the same suit and the dealer is holding a 7 in any suit, there
+            # is a $1,000 bonus paid to the player.
+            # If the player has bet more than $25 at the start of the hand, this climbs all the way to $5,000.
+            if self.dealer.hand.has_card(CardValue.SEVEN):
+                if self.bet > 25:
+                    self.player.wallet += 5000
+                else:
+                    self.player.wallet += 1000
+        elif len(hand.cards) == 3 and values.count(7) == 3:
+            # A 777 of mixed suit pays 3:2.
+            self.player.wallet += (self.bet * (3 / 2))
+        elif len(hand.cards) == 3 and values.count(6) == 1 and values.count(7) == 1 and values.count(8) == 1:
+            # A 678 of mixed suit pays 3:2.
+            self.player.wallet += (self.bet * (3 / 2))
         else:
-            self.in_game_message += Fore.BLACK + Style.BRIGHT + \
-                                    'No winner{}\n'.format(split_hand_text) + Style.RESET_ALL
-            outcome = GameWinner.DRAW
-
-        return outcome
+            self.player.wallet += self.bet * 2
 
     def calculate_winnings(self):
         """Calculate winnings for Player"""
 
-        if self.player.hand.outcome != GameWinner.DRAW:
-            # Blackjack pays 3 to 2
-            if self.player.hand.blackjack():
-                self.player.wallet += (self.bet * (3 / 2))
-            else:
-                self.player.wallet += self.bet * 2
+        if self.player.hand.outcome != GameWinner.DRAW or self.player.hand.blackjack():
+            self.apply_odds(self.player.hand)
         else:
             self.player.wallet += self.bet
 
         if self.player.split_hand.outcome != GameWinner.NOTSET:
-            if self.player.split_hand.outcome != GameWinner.DRAW:
+            if self.player.split_hand.outcome != GameWinner.DRAW or self.player.split_hand.blackjack():
                 # Blackjack pays 3 to 2
-                if self.player.split_hand.blackjack():
-                    self.player.wallet += (self.split_bet * (3 / 2))
-                else:
-                    self.player.wallet += self.split_bet * 2
+                self.apply_odds(self.player.split_hand)
             else:
                 self.player.wallet += self.split_bet
 
