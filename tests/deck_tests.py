@@ -1,6 +1,6 @@
 """Testing the deck of blackjack"""
 import pytest
-from library.card.entities import Shoe, Deck, Joker, Diamonds, Spades, Clubs, Hearts, CardValue, CardSuit, CardCollection
+from library.card.entities import Shoe, Deck, Joker, Diamonds, Spades, Clubs, Hearts, CardValue, CardSuit, Card, CardCollection
 
 
 @pytest.fixture
@@ -150,6 +150,20 @@ def test_card_collection_all_same_suite(card1, card2, card3, expected):
 def test_card_collection_values(card1, card2, card3, expected):
     cards = CardCollection([card1, card2, card3])
     assert cards.values() == expected
+
+
+def test_card_collection_has_card():
+    cards = CardCollection([Diamonds(CardValue.TEN), Clubs(CardValue.SIX)])
+
+    assert cards.has_card(Diamonds(CardValue.TEN))
+    assert cards.has_card(Card(CardValue.TEN, CardSuit.DIAMONDS))
+    assert cards.has_card(CardValue.TEN)
+    assert cards.has_card(CardSuit.DIAMONDS)
+
+    assert not cards.has_card(Clubs(CardValue.TEN))
+    assert not cards.has_card(Card(CardValue.TEN, CardSuit.SPADES))
+    assert not cards.has_card(CardValue.FIVE)
+    assert not cards.has_card(CardSuit.SPADES)
 
 
 def test_shoe_creation(shoe):

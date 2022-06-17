@@ -1,7 +1,6 @@
 """Blackjack card game
    https://www.bestuscasinos.org/blog/understanding-5-different-forms-of-blackjack/"""
 from colorama import Fore, Style
-from EventNotifier import Notifier
 
 from library.card.entities import Shoe, Diamonds, Clubs, Spades, Hearts, CardValue
 from library.game.entities import BlackJackPlayer, Player
@@ -12,7 +11,8 @@ from library.exceptions.game import OutOfFundsException
 class Blackjack:
     """Blackjack game class"""
     def __init__(self, shoe_size: int = 1, wallet_amount:float = 100):
-        self.game_name = Fore.GREEN + Style.BRIGHT + '-'*16 + 'Blackjack' + '-'*16 + '\n' \
+        self.game_color = Fore.GREEN + Style.BRIGHT
+        self.game_name = self.game_color + '-'*16 + 'Blackjack' + '-'*16 + '\n' \
                   + Style.RESET_ALL
         self.shoe_size = shoe_size
         self.shoe = Shoe(shoe_size)
@@ -58,7 +58,7 @@ class Blackjack:
         else:
             output += ' '.join(str(card) for card in self.player.hand.cards)
 
-        output += Fore.LIGHTBLACK_EX + Style.BRIGHT + '\n' + '-'*41 + '\n' + Style.RESET_ALL
+        output += self.game_color + '\n' + '-'*41 + '\n' + Style.RESET_ALL
         output += Fore.LIGHTBLUE_EX + Style.NORMAL + 'blackjack pays (3/2)\n' + Style.RESET_ALL
         output += 'remaining cards: {}'.format(self.shoe.remaining())
         output += '\n'
@@ -295,7 +295,8 @@ class FaceUp21(Blackjack):
     """Face Up 21, a variation of Blackjack. See readme for rules"""
     def __init__(self, shoe_size: int = 1, wallet_amount: float = 100):
         super().__init__(shoe_size, wallet_amount)
-        self.game_name = Fore.BLUE + Style.BRIGHT + '-' * 16 + 'Face Up 21' + '-' * 15 + '\n' \
+        self.game_color = Fore.BLUE + Style.BRIGHT
+        self.game_name = self.game_color + '-' * 16 + 'Face Up 21' + '-' * 15 + '\n' \
                          + Style.RESET_ALL
 
     def play(self) -> None:
@@ -323,7 +324,8 @@ class Spanish21(Blackjack):
     """Spanish 21, a variation of Blackjack. See readme for rules"""
     def __init__(self, shoe_size: int = 1, wallet_amount: float = 100):
         super().__init__(shoe_size, wallet_amount)
-        self.game_name = Fore.RED + Style.BRIGHT + '-' * 16 + 'Spanish 21' + '-' * 15 + '\n' \
+        self.game_color = Fore.RED + Style.BRIGHT
+        self.game_name = self.game_color + '-' * 16 + 'Spanish 21' + '-' * 15 + '\n' \
                          + Style.RESET_ALL
         self.remove_tens()
         self.shoe.notifier.subscribe("reset", self.remove_tens)
@@ -366,6 +368,9 @@ class Spanish21(Blackjack):
         elif len(hand.cards) == 3 and values.count(7) == 3:
             # A 777 of mixed suit pays 3:2.
             self.player.wallet += (self.bet * (3 / 2))
+        elif len(hand.cards) == 3 and hand.all_same_suit() and values.count(6) == 1 and values.count(7) == 1 and values.count(8) == 1:
+            # A 678 of same suit pays 2:1.
+            self.player.wallet += (self.bet * (2 / 1))
         elif len(hand.cards) == 3 and values.count(6) == 1 and values.count(7) == 1 and values.count(8) == 1:
             # A 678 of mixed suit pays 3:2.
             self.player.wallet += (self.bet * (3 / 2))

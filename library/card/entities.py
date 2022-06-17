@@ -129,7 +129,7 @@ class CardCollection:
         exists = False
 
         for arg in args:
-            if type(arg) == Card:
+            if type(arg) == Card or issubclass(type(arg), Card):
                 card = arg
                 break
             elif type(arg) == CardSuit:
@@ -139,22 +139,19 @@ class CardCollection:
 
         if card is not None:
             exists = len(list(filter(lambda target: target.value == card.value \
-                                           and target.suit == card.suit, self.cards))) > 0
+                                    and target.suit == card.suit, self.cards))) > 0
         elif card_suit is not None and card_value is not None:
-            exists = len(list(filter(lambda target: target.value == card_value.value \
-                                                    and target.suit == card_suit.suit, self.cards))) > 0
+            exists = len(list(filter(lambda target: target.value == card_value \
+                                     and target.suit == card_suit, self.cards))) > 0
         elif card_suit is not None:
-            exists = len(list(filter(lambda target: target.suit == card_suit.suit, self.cards))) > 0
+            exists = len(list(filter(lambda target: target.suit == card_suit, self.cards))) > 0
         elif card_value is not None:
-            exists = len(list(filter(lambda target: target.value == card_value.value, self.cards))) > 0
+            exists = len(list(filter(lambda target: target.value == card_value, self.cards))) > 0
 
         return exists
 
     def all_same_suit(self) -> bool:
-        diamonds_count = 0
-        clubs_count = 0
-        spades_count = 0
-        hearts_count = 0
+        """Returns True if all cards in collection are the same suit"""
         card_in_collection = len(self.cards)
 
         diamonds_count = len(list(filter(lambda target: target.suit == CardSuit.DIAMONDS, self.cards)))
@@ -169,7 +166,7 @@ class CardCollection:
         return False
 
     def values(self) -> []:
-        """Return a tuple of all card values"""
+        """Return a list of all card values"""
         values = []
         for card in self.cards:
             values.append(card.numerical_value())
