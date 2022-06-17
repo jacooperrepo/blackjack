@@ -1,15 +1,17 @@
-"""Blackjack card game"""
+"""Blackjack card game
+   https://www.bestuscasinos.org/blog/understanding-5-different-forms-of-blackjack/"""
 from colorama import Fore, Style
-from library.card.entities import Shoe
+from library.card.entities import Shoe, Diamonds, Clubs, Spades, Hearts, CardValue
 from library.game.entities import BlackJackPlayer, Player
 from library.game.enums import GameWinner, PlayerHandStatus
 from library.exceptions.game import OutOfFundsException
 
 
 class Blackjack:
-    """Blackjack game class"""
-
+    """Blackjack game class
+    Like traditional blackjack, the dealer hits on 16 and stands on 17. """
     def __init__(self, shoe_size: int = 1, wallet_amount:float = 100):
+        self.game_name = "Blackjack"
         self.shoe_size = shoe_size
         self.shoe = Shoe(shoe_size)
         self.player = BlackJackPlayer()
@@ -27,7 +29,7 @@ class Blackjack:
         if self.split_bet > 0:
             output += Fore.LIGHTRED_EX + Style.NORMAL + "split bet: $" + \
                       str(round(self.split_bet, 2)) + "\n"
-        output += Fore.GREEN + Style.BRIGHT + '-'*16 + 'Blackjack' + '-'*16 + '\n' \
+        output += Fore.GREEN + Style.BRIGHT + '-'*16 + self.game_name + '-'*16 + '\n' \
                   + Style.RESET_ALL
         if self.player.status in(PlayerHandStatus.ENDED, PlayerHandStatus.SPLIT_ENDED):
             output += Fore.BLACK + Style.BRIGHT + '* '
@@ -112,7 +114,7 @@ class Blackjack:
                 except ValueError:
                     pass
 
-        if self.player.wallet - valid_bet < 0:
+        if self.player.wallet - valid_bet < 0 or valid_bet < 0:
             self.place_your_bets()
         else:
             self.player.wallet -= valid_bet
@@ -286,3 +288,54 @@ class Blackjack:
                     self.player.wallet += self.split_bet * 2
             else:
                 self.player.wallet += self.split_bet
+
+
+class FaceUp21(Blackjack):
+    """In this version of the game, both of the dealer’s cards are dealt and shown face up.
+       It goes without saying that being able to see two cards instead of just one gives gamblers
+       tremendous insight into how they should be betting during the hand.
+       Unfortunately, it isn’t all good news for gamblers when it comes to this game. For example,
+       a dealer hits on soft 17, and dealer blackjack beats a player blackjack, and blackjack only pays even money.
+       Similar to European blackjack, in Face Up 21 players can only double down on 9, 10, and 11."""
+    def __init__(self, shoe_size: int = 1, wallet_amount: float = 100):
+        super().__init__(shoe_size, wallet_amount)
+        self.game_name = "Face Up 21"
+
+    def play(self) -> None:
+        """Game logic to run the game"""
+        keep_playing = ''
+
+        try:
+            while keep_playing != 'Q':
+                self.dealer.hand.add(self.shoe.deal())
+                self.dealer.hand.add(self.shoe.deal())
+                self.player.hand.add(self.shoe.deal())
+
+                keep_playing = self.process_input()
+                print(self)
+
+                self.reset()
+
+        except IndexError:
+            print(Fore.RED + Style.BRIGHT + 'Out of cards' + Style.RESET_ALL)
+        except OutOfFundsException:
+            print(Fore.RED + Style.BRIGHT + 'Out of funds' + Style.RESET_ALL)
+
+
+class Spanish21(Blackjack):
+    """A five-card 21 pays out at 3:2.
+       A Six-card 21 pays 2:1
+       A seven-card 21 pays out at 3:1.
+       A 678 and 777 of mixed suit pays 3:2. If they’re the same suit it pays 2:1.
+       If a player has 777 of the same suit and the dealer is holding a 7 in any suit, there is a $1,000 bonus paid to the player.
+       If the player has bet more than $25 at the start of the hand, this climbs all the way to $5,000.
+       Blackjack (a natural total of 21 on the first two cards) always wins, and is always paid 3:2 regardless of whether or not the dealer
+       has a blackjack.
+       Like traditional blackjack, the dealer hits on 16 and stands on 17."""
+    def __init__(self, shoe_size: int = 1, wallet_amount: float = 100):
+        super().__init__(shoe_size, wallet_amount)
+        self.game_name = "Spanish 21"
+        self.shoe.remove(Diamonds(CardValue.TEN))
+        self.shoe.remove(Hearts(CardValue.TEN))
+        self.shoe.remove(Clubs(CardValue.TEN))
+        self.shoe.remove(Spades(CardValue.TEN))
