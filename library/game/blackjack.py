@@ -23,6 +23,7 @@ class Blackjack:
         self.dealer = Player()
         self.game_rules = self.get_rules()
         self.in_game_message = ''
+        self.game_blackjack_odds_message = 'blackjack pays (3/2)'
 
     @staticmethod
     def get_rules() -> str:
@@ -73,7 +74,7 @@ class Blackjack:
             output += ' '.join(str(card) for card in self.player.hand.cards)
 
         output += self.game_color + '\n' + '-'*41 + '\n' + Style.RESET_ALL
-        output += Fore.LIGHTBLUE_EX + Style.NORMAL + 'blackjack pays (3/2)\n' + Style.RESET_ALL
+        output += Fore.LIGHTBLUE_EX + Style.NORMAL + self.game_blackjack_odds_message + '\n' + Style.RESET_ALL
         output += 'remaining cards: {}'.format(self.shoe.remaining())
         output += '\n'
         output += self.in_game_message
@@ -312,13 +313,14 @@ class FaceUp21(Blackjack):
         self.game_color = Fore.BLUE + Style.BRIGHT
         self.game_name = self.game_color + '-' * 16 + 'Face Up 21' + '-' * 15 + '\n' \
                          + Style.RESET_ALL
+        self.game_blackjack_odds_message = 'blackjack pays even money'
 
     @staticmethod
     def get_rules() -> str:
         """Get the rules text for the game"""
         rules = ''
         try:
-            with open('./library/game/rules/faceup21.txt', 'r') as f:
+            with open('./library/game/rules/face_up_21.txt', 'r') as f:
                 rules = f.read()
         except IOError:
             pass
@@ -373,6 +375,7 @@ class Spanish21(Blackjack):
         self.game_color = Fore.RED + Style.BRIGHT
         self.game_name = self.game_color + '-' * 16 + 'Spanish 21' + '-' * 15 + '\n' \
                          + Style.RESET_ALL
+        self.game_blackjack_odds_message = 'blackjack pays (3/2)'
         self.remove_tens()
         self.shoe.notifier.subscribe("reset", self.remove_tens)
 
@@ -381,7 +384,7 @@ class Spanish21(Blackjack):
         """Get the rules text for the game"""
         rules = ''
         try:
-            with open('./library/game/rules/spanish21.txt', 'r') as f:
+            with open('./library/game/rules/spanish_21.txt', 'r') as f:
                 rules = f.read()
         except IOError:
             pass
