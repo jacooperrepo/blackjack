@@ -150,8 +150,10 @@ class Blackjack:
             print(self)
 
             entry = input('{}H {}to hit {}S {}to stand {}F {}to fold\n'
-                          '{}R {}to reset deck {}X {}to split {}Q {}to end '
+                          '{}R {}to reset deck {}X {}to split {}D {}to double down\n{}Q {}to end '
                           .format(Fore.LIGHTBLUE_EX,
+                                  Fore.LIGHTBLACK_EX,
+                                  Fore.LIGHTBLUE_EX,
                                   Fore.LIGHTBLACK_EX,
                                   Fore.LIGHTBLUE_EX,
                                   Fore.LIGHTBLACK_EX,
@@ -172,6 +174,20 @@ class Blackjack:
                         PlayerHandStatus.SPLIT_IN_PLAY_HAND_TWO:
                     self.check_winner()
                     break
+            elif entry.upper() == 'D': # Double down
+                if self.player.status == PlayerHandStatus.IN_PLAY and len(self.player.hand.cards) == 1:
+                    if self.player.wallet - self.bet >= 0:
+                        self.player.wallet -= self.bet
+                        self.bet *= 2
+                elif self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_ONE and len(self.player.hand.cards) == 1:
+                    if self.player.wallet - self.bet >= 0:
+                        self.player.wallet -= self.bet
+                        self.bet *= 2
+                elif self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_TWO and len(self.player.split_hand.cards) == 1:
+                    if self.player.wallet - self.split_bet >= 0:
+                        self.player.wallet -= self.split_bet
+                        self.split_bet *= 2
+                continue
             elif entry.upper() == 'S':  # Stand
                 if self.player.status in(PlayerHandStatus.ENDED, PlayerHandStatus.SPLIT_ENDED):
                     self.check_winner()
