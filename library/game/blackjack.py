@@ -325,6 +325,26 @@ class FaceUp21(Blackjack):
 
         return rules
 
+    def calculate_winnings(self):
+        """Calculate winnings for Player"""
+
+        if self.player.hand.outcome != GameWinner.DRAW:
+            self.player.wallet += self.bet * 2
+        elif self.dealer.hand.blackjack():
+            # dealer blackjack beats a player blackjack
+            pass
+        else:
+            self.player.wallet += self.bet
+
+        if self.player.split_hand.outcome != GameWinner.NOTSET:
+            if self.player.split_hand.outcome != GameWinner.DRAW:
+                self.player.wallet += self.split_bet * 2
+            elif self.dealer.hand.blackjack():
+                # dealer blackjack beats a player blackjack
+                pass
+            else:
+                self.player.wallet += self.bet
+
     def play(self) -> None:
         """Game logic to run the game"""
         keep_playing = ''
