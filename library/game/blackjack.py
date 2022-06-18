@@ -385,19 +385,45 @@ class FaceUp21(Blackjack):
             else:
                 self.player.wallet += self.bet
 
+    def place_your_bets(self):
+        """Get bet input from user"""
+        valid_entry = False
+        valid_bet = 0
+
+        while not valid_entry:
+            if self.player.wallet <= 0:
+                raise OutOfFundsException
+
+            bet = input('Place your bet: ')
+
+            try:
+                valid_bet = int(bet)
+                valid_entry = True
+            except ValueError:
+                try:
+                    valid_bet = float(bet)
+                    valid_entry = True
+                except ValueError:
+                    pass
+
+        if self.player.wallet - valid_bet < 0 or valid_bet < 0:
+            self.place_your_bets()
+        else:
+            self.player.wallet -= valid_bet
+            self.bet = valid_bet
+
+            self.dealer.hand.add(self.shoe.deal())
+            self.dealer.hand.add(self.shoe.deal())
+            self.player.hand.add(self.shoe.deal())
+
     def play(self) -> None:
         """Game logic to run the game"""
         keep_playing = ''
 
         try:
             while keep_playing != 'Q':
-                self.dealer.hand.add(self.shoe.deal())
-                self.dealer.hand.add(self.shoe.deal())
-                self.player.hand.add(self.shoe.deal())
-
                 keep_playing = self.process_input()
                 print(self)
-
                 self.reset()
 
         except IndexError:
