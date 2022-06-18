@@ -1,7 +1,7 @@
 """Entities for the blackjack game"""
-from library.card.entities import CardCollection
-from library.card.enums import CardValue
-from library.game.enums import PlayerHandStatus, GameWinner
+from src.card.entities import CardCollection
+from src.card.enums import CardValue
+from src.game.enums import PlayerHandStatus, GameWinner
 
 
 class Hand(CardCollection):

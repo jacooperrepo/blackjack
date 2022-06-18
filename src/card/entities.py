@@ -3,7 +3,7 @@ from random import shuffle
 from colorama import Fore, Style
 from EventNotifier import Notifier
 
-from library.card.enums import CardSuit, CardValue
+from src.card.enums import CardSuit, CardValue
 
 
 class Card:

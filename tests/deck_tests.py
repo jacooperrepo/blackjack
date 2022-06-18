@@ -1,6 +1,6 @@
 """Testing the deck of blackjack"""
 import pytest
-from library.card.entities import Shoe, Deck, Joker, Diamonds, Spades, Clubs, Hearts, CardValue, CardSuit, Card, CardCollection
+from src.card.entities import Shoe, Deck, Joker, Diamonds, Spades, Clubs, Hearts, CardValue, CardSuit, Card, CardCollection
 
 
 @pytest.fixture

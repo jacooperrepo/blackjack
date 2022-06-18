@@ -2,10 +2,10 @@
    https://www.bestuscasinos.org/blog/understanding-5-different-forms-of-blackjack/"""
 from colorama import Fore, Style
 
-from library.card.entities import Shoe, Diamonds, Clubs, Spades, Hearts, CardValue
-from library.game.entities import BlackJackPlayer, Player
-from library.game.enums import GameWinner, PlayerHandStatus
-from library.exceptions.game import OutOfFundsException
+from src.card.entities import Shoe, Diamonds, Clubs, Spades, Hearts, CardValue
+from src.game.entities import BlackJackPlayer, Player
+from src.game.enums import GameWinner, PlayerHandStatus
+from src.exceptions.game import OutOfFundsException
 
 
 class Blackjack:

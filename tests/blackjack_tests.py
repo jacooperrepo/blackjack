@@ -1,9 +1,9 @@
 import pytest
-from library.game.blackjack import Blackjack, Spanish21, FaceUp21
-from library.card.entities import Card
-from library.card.enums import CardSuit, CardValue
-from library.game.enums import PlayerHandStatus
-from library.game.entities import Hand
+from src.game.blackjack import Blackjack, Spanish21, FaceUp21
+from src.card.entities import Card
+from src.card.enums import CardSuit, CardValue
+from src.game.enums import PlayerHandStatus
+from src.game.entities import Hand
 
 
 @pytest.fixture(scope="class")
