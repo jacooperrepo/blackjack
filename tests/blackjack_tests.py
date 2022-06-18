@@ -130,6 +130,25 @@ def test_spanish_21_deck_creation():
     assert len(list(found_cards)) == 0
 
 
+@pytest.mark.parametrize("card, status, expected", [
+    (Card(CardValue.KING, CardSuit.SPADES), PlayerHandStatus.IN_PLAY, 20),
+    (Card(CardValue.ACE, CardSuit.SPADES), PlayerHandStatus.IN_PLAY, 20),
+    (Card(CardValue.TEN, CardSuit.SPADES), PlayerHandStatus.IN_PLAY, 20),
+    (Card(CardValue.NINE, CardSuit.SPADES), PlayerHandStatus.IN_PLAY, 20),
+    (Card(CardValue.EIGHT, CardSuit.SPADES), PlayerHandStatus.IN_PLAY, 10)])
+def test_faceup_21_double_down(card, status, expected):
+    game = FaceUp21(1, 0)
+
+    game.player.hand.add(card)
+    game.player.status = status
+    game.bet = 10
+    game.player.wallet = 10
+    game.double_down()
+
+    assert game.bet == expected
+
+
+
 def test_faceup_21_calculate_winnings():
     game = FaceUp21(1, 0)
 

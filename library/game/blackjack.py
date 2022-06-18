@@ -136,6 +136,21 @@ class Blackjack:
             self.player.wallet -= valid_bet
             self.bet = valid_bet
 
+    def double_down(self):
+        """Double down initial bet"""
+        if self.player.status == PlayerHandStatus.IN_PLAY and len(self.player.hand.cards) == 1:
+            if self.player.wallet - self.bet >= 0:
+                self.player.wallet -= self.bet
+                self.bet *= 2
+        elif self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_ONE and len(self.player.hand.cards) == 1:
+            if self.player.wallet - self.bet >= 0:
+                self.player.wallet -= self.bet
+                self.bet *= 2
+        elif self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_TWO and len(self.player.split_hand.cards) == 1:
+            if self.player.wallet - self.split_bet >= 0:
+                self.player.wallet -= self.split_bet
+                self.split_bet *= 2
+
     def process_input(self) -> str:
         """Process player input"""
         entry = ''
@@ -175,18 +190,7 @@ class Blackjack:
                     self.check_winner()
                     break
             elif entry.upper() == 'D': # Double down
-                if self.player.status == PlayerHandStatus.IN_PLAY and len(self.player.hand.cards) == 1:
-                    if self.player.wallet - self.bet >= 0:
-                        self.player.wallet -= self.bet
-                        self.bet *= 2
-                elif self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_ONE and len(self.player.hand.cards) == 1:
-                    if self.player.wallet - self.bet >= 0:
-                        self.player.wallet -= self.bet
-                        self.bet *= 2
-                elif self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_TWO and len(self.player.split_hand.cards) == 1:
-                    if self.player.wallet - self.split_bet >= 0:
-                        self.player.wallet -= self.split_bet
-                        self.split_bet *= 2
+                self.double_down()
                 continue
             elif entry.upper() == 'S':  # Stand
                 if self.player.status in(PlayerHandStatus.ENDED, PlayerHandStatus.SPLIT_ENDED):
@@ -342,6 +346,24 @@ class FaceUp21(Blackjack):
             pass
 
         return rules
+
+    def double_down(self):
+        """Double down initial bet"""
+        if self.player.status == PlayerHandStatus.IN_PLAY and len(self.player.hand.cards) == 1:
+            if self.player.hand.cards[0].numerical_value() in (1, 9, 10):
+                if self.player.wallet - self.bet >= 0:
+                    self.player.wallet -= self.bet
+                    self.bet *= 2
+        elif self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_ONE and len(self.player.hand.cards) == 1:
+            if self.player.hand.cards[0].numerical_value() in (1, 9, 10):
+                if self.player.wallet - self.bet >= 0:
+                    self.player.wallet -= self.bet
+                    self.bet *= 2
+        elif self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_TWO and len(self.player.split_hand.cards) == 1:
+            if self.player.split_hand.cards[0].numerical_value() in (1, 9, 10):
+                if self.player.wallet - self.split_bet >= 0:
+                    self.player.wallet -= self.split_bet
+                    self.split_bet *= 2
 
     def calculate_winnings(self):
         """Calculate winnings for Player"""
