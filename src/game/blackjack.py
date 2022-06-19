@@ -10,7 +10,7 @@ from src.exceptions.game import OutOfFundsException
 
 class Blackjack:
     """Blackjack game class"""
-    def __init__(self, shoe_size: int = 1, wallet_amount:float = 100):
+    def __init__(self, shoe_size: int = 1, wallet_amount:float = 100, display_rules:bool = True):
         self.game_color = Fore.GREEN + Style.BRIGHT
         self.game_name = self.game_color + '-'*16 + 'Blackjack' + '-'*16 + '\n' \
                   + Style.RESET_ALL
@@ -19,9 +19,13 @@ class Blackjack:
         self.player = BlackJackPlayer()
         self.player.wallet = wallet_amount
         self.dealer = Player()
-        self.game_rules = self.get_rules()
         self.in_game_message = ''
         self.game_blackjack_odds_message = 'blackjack pays (3/2)'
+
+        if display_rules:
+            self.game_rules = self.get_rules()
+        else:
+            self.game_rules = ''
 
     @staticmethod
     def get_rules() -> str:
@@ -327,8 +331,8 @@ class Blackjack:
 
 class FaceUp21(Blackjack):
     """Face Up 21, a variation of Blackjack. See readme for rules"""
-    def __init__(self, shoe_size: int = 1, wallet_amount: float = 100):
-        super().__init__(shoe_size, wallet_amount)
+    def __init__(self, shoe_size: int = 1, wallet_amount: float = 100, display_rules:bool = True):
+        super().__init__(shoe_size, wallet_amount, display_rules)
         self.game_color = Fore.BLUE + Style.BRIGHT
         self.game_name = self.game_color + '-' * 16 + 'Face Up 21' + '-' * 15 + '\n' \
                          + Style.RESET_ALL
@@ -436,8 +440,8 @@ class FaceUp21(Blackjack):
 
 class Spanish21(Blackjack):
     """Spanish 21, a variation of Blackjack. See readme for rules"""
-    def __init__(self, shoe_size: int = 1, wallet_amount: float = 100):
-        super().__init__(shoe_size, wallet_amount)
+    def __init__(self, shoe_size: int = 1, wallet_amount: float = 100, display_rules:bool = True):
+        super().__init__(shoe_size, wallet_amount, display_rules)
         self.remove_tens()
         self.shoe.notifier.subscribe("reset", self.remove_tens)
 
@@ -519,8 +523,9 @@ class Spanish21(Blackjack):
 
 
 class BlackjackGameCollection:
-    def __init__(self, shoe_size: int = 1, wallet_amount: float = 100):
+    def __init__(self, shoe_size: int = 1, wallet_amount: float = 100, display_rules:bool = True):
         self.games = (Blackjack, FaceUp21, Spanish21)
+        self.display_rules = display_rules
         self.size = shoe_size
         self.wallet_amount = wallet_amount
 
@@ -537,7 +542,7 @@ class BlackjackGameCollection:
         self.play(game_selection)
 
     def play(self, game_selection:int = 0):
-        self.games[game_selection](self.size, self.wallet_amount).play()
+        self.games[game_selection](self.size, self.wallet_amount, self.display_rules).play()
 
 
 

@@ -1,6 +1,7 @@
 # Blackjack Game Collection
 
-**BlackjackGameCollection**
+### **BlackjackGameCollection**
+
 This is the game collection class that is used to start one of the three games as detailed below.
 Create a new instance of this class and call the select_game method to request player input on game selection
 
@@ -8,22 +9,26 @@ game = BlackjackGameCollection()
 
 game.select_game()
 
-Optionally supply the shoe size (number of decks) and wallet size for the player. Defaults are 1 for shoe size and 100 for wallet amount.
+#### Parameters
 
-**Blackjack**
+* shoe_size (int): Number of decks in the shoe. Defaults to 1
+* wallet_amount (float): Starting wallet for player. Defaults to 100
+* display_rules (bool): Display the rules of the game or not. Defaults to True
+
+### Blackjack
 
 _Rules_
 1. Blackjack pays 3/2
 2. The dealer hits on 16 and stands on 17.
 
-**FaceUp21**
+### FaceUp21
 
 Rules
 1. In this version of the game, both of the dealer’s cards are dealt and shown face up.
 2. Dealer hits on soft 17, and dealer blackjack beats a player blackjack, and blackjack only pays even money.
 3. Players can only double down on 9, 10, and 11.
 
-**Spanish21**
+### Spanish21
 
 Rules
 1. A five-card 21 pays out at 3:2 
