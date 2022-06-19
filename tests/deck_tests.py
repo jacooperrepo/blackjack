@@ -129,6 +129,26 @@ def test_remove_card_from_deck(player_deck):
     assert len(found_cards_list) == 0
     assert len(player_deck.cards) == 51
 
+    player_deck.reset()
+
+    player_deck.remove(CardValue.ACE)
+
+    found_cards = filter(lambda card: card.value == CardValue.ACE, player_deck.cards)
+    found_cards_list = list(found_cards)
+
+    assert len(found_cards_list) == 0
+    assert len(player_deck.cards) == 48
+
+    player_deck.reset()
+
+    player_deck.remove(CardSuit.SPADES)
+
+    found_cards = filter(lambda card: card.suit == CardSuit.SPADES, player_deck.cards)
+    found_cards_list = list(found_cards)
+
+    assert len(found_cards_list) == 0
+    assert len(player_deck.cards) == 39
+
 
 @pytest.mark.parametrize("card1, card2, card3, expected", [
     (Diamonds(CardValue.ACE), Diamonds(CardValue.TEN), Diamonds(CardValue.TEN), True),

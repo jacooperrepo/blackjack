@@ -96,14 +96,9 @@ class Blackjack:
 
         try:
             while keep_playing != 'Q':
-                self.dealer.hand.add(self.shoe.deal())
-                self.player.hand.add(self.shoe.deal())
-
                 keep_playing = self.process_input()
                 print(self)
-
                 self.reset()
-
         except IndexError:
             print(Fore.RED + Style.BRIGHT + 'Out of cards' + Style.RESET_ALL)
         except OutOfFundsException:
@@ -135,6 +130,8 @@ class Blackjack:
         else:
             self.player.wallet -= valid_bet
             self.player.hand.bet = valid_bet
+            self.dealer.hand.add(self.shoe.deal())
+            self.player.hand.add(self.shoe.deal())
 
     def double_down(self):
         """Double down initial bet"""
@@ -421,21 +418,6 @@ class FaceUp21(Blackjack):
             self.dealer.hand.add(self.shoe.deal())
             self.dealer.hand.add(self.shoe.deal())
             self.player.hand.add(self.shoe.deal())
-
-    def play(self) -> None:
-        """Game logic to run the game"""
-        keep_playing = ''
-
-        try:
-            while keep_playing != 'Q':
-                keep_playing = self.process_input()
-                print(self)
-                self.reset()
-
-        except IndexError:
-            print(Fore.RED + Style.BRIGHT + 'Out of cards' + Style.RESET_ALL)
-        except OutOfFundsException:
-            print(Fore.RED + Style.BRIGHT + 'Out of funds' + Style.RESET_ALL)
 
 
 class Spanish21(Blackjack):
