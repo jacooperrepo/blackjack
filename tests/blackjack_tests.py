@@ -141,11 +141,11 @@ def test_faceup_21_double_down(card, status, expected):
 
     game.player.hand.add(card)
     game.player.status = status
-    game.bet = 10
+    game.player.hand.bet = 10
     game.player.wallet = 10
     game.double_down()
 
-    assert game.bet == expected
+    assert game.player.hand.bet == expected
 
 
 
@@ -158,7 +158,7 @@ def test_faceup_21_calculate_winnings():
     game.dealer.hand.add(Card(CardValue.TEN, CardSuit.SPADES))
 
     # dealer blackjack beats a player blackjack
-    game.bet = 10
+    game.player.hand.bet = 10
     game.check_winner()
     assert game.player.wallet == 0
 
@@ -171,7 +171,7 @@ def test_faceup_21_calculate_winnings():
     game.dealer.hand.add(Card(CardValue.TEN, CardSuit.SPADES))
 
     # dealer blackjack beats a player blackjack
-    game.bet = 10
+    game.player.hand.bet = 10
     game.check_winner()
     assert game.player.wallet == 20
 
@@ -184,7 +184,7 @@ def test_faceup_21_calculate_winnings():
     game.dealer.hand.add(Card(CardValue.TEN, CardSuit.SPADES))
 
     # dealer blackjack beats a player blackjack
-    game.bet = 10
+    game.player.hand.bet = 10
     game.check_winner()
     assert game.player.wallet == 10
 
@@ -196,7 +196,7 @@ def test_spanish_21_calculate_winnings():
     game.player.hand.add(Card(CardValue.TEN, CardSuit.SPADES))
 
     # Blackjack pays 3/2
-    game.bet = 10
+    game.player.hand.bet = 10
     game.check_winner()
     assert game.player.wallet == 15
 
@@ -209,7 +209,7 @@ def test_spanish_21_calculate_winnings():
     game.player.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
     game.player.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
     game.player.hand.add(Card(CardValue.EIGHT, CardSuit.SPADES))
-    game.bet = 10
+    game.player.hand.bet = 10
     game.check_winner()
     assert game.player.wallet == 15
 
@@ -223,7 +223,7 @@ def test_spanish_21_calculate_winnings():
     game.player.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
     game.player.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
     game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
-    game.bet = 10
+    game.player.hand.bet = 10
     game.check_winner()
     assert game.player.wallet == 20
 
@@ -238,7 +238,7 @@ def test_spanish_21_calculate_winnings():
     game.player.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
     game.player.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
     game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
-    game.bet = 10
+    game.player.hand.bet = 10
     game.check_winner()
     assert game.player.wallet == 30
 
@@ -249,7 +249,7 @@ def test_spanish_21_calculate_winnings():
     game.player.hand.add(Card(CardValue.SIX, CardSuit.SPADES))
     game.player.hand.add(Card(CardValue.SEVEN, CardSuit.DIAMONDS))
     game.player.hand.add(Card(CardValue.EIGHT, CardSuit.SPADES))
-    game.bet = 10
+    game.player.hand.bet = 10
     game.check_winner()
     assert game.player.wallet == 15
 
@@ -260,7 +260,7 @@ def test_spanish_21_calculate_winnings():
     game.player.hand.add(Card(CardValue.SIX, CardSuit.SPADES))
     game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
     game.player.hand.add(Card(CardValue.EIGHT, CardSuit.SPADES))
-    game.bet = 10
+    game.player.hand.bet = 10
     game.check_winner()
     assert game.player.wallet == 20
 
@@ -271,7 +271,7 @@ def test_spanish_21_calculate_winnings():
     game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
     game.player.hand.add(Card(CardValue.SEVEN, CardSuit.DIAMONDS))
     game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
-    game.bet = 10
+    game.player.hand.bet = 10
     game.check_winner()
     assert game.player.wallet == 15
 
@@ -282,7 +282,7 @@ def test_spanish_21_calculate_winnings():
     game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
     game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
     game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
-    game.bet = 10
+    game.player.hand.bet = 10
     game.check_winner()
     assert game.player.wallet == 20
 
@@ -297,7 +297,7 @@ def test_spanish_21_calculate_winnings():
     game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
     game.dealer.hand.add(Card(CardValue.SEVEN, CardSuit.DIAMONDS))
 
-    game.bet = 10
+    game.player.hand.bet = 10
     game.check_winner()
     assert game.player.wallet == 1020
 
@@ -310,7 +310,7 @@ def test_spanish_21_calculate_winnings():
     game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
     game.player.hand.add(Card(CardValue.SEVEN, CardSuit.SPADES))
     game.dealer.hand.add(Card(CardValue.SEVEN, CardSuit.DIAMONDS))
-    game.bet = 26
+    game.player.hand.bet = 26
     game.check_winner()
     assert game.player.wallet == 5052
 
@@ -322,7 +322,7 @@ def test_spanish_21_calculate_winnings():
     game.player.hand.add(Card(CardValue.TEN, CardSuit.SPADES))
     game.dealer.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
     game.dealer.hand.add(Card(CardValue.JACK, CardSuit.DIAMONDS))
-    game.bet = 10
+    game.player.hand.bet = 10
     game.check_winner()
     assert game.player.wallet == 15
 

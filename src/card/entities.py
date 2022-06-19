@@ -94,16 +94,37 @@ class CardCollection:
         """Add a card to the deck"""
         self.cards.append(card)
 
-    def remove(self, card: Card) -> bool:
+    def remove(self, *args):
         """Remove a card from the deck"""
-        try:
-            for remove_card in filter(lambda target: target.value == card.value \
-                                                     and target.suit == card.suit, self.cards):
-                self.cards.remove(remove_card)
-        except ValueError:
-            return False
-        else:
-            return True
+        card = None
+        card_suit = None
+        card_value = None
+
+        cards_to_remove = []
+
+        for arg in args:
+            if type(arg) == Card or issubclass(type(arg), Card):
+                card = arg
+                break
+            elif type(arg) == CardSuit:
+                card_suit = arg
+            elif type(arg) == CardValue:
+                card_value = arg
+
+        if card is not None:
+            cards_to_remove = list(filter(lambda target: target.value == card.value \
+                                    and target.suit == card.suit, self.cards))
+        elif card_suit is not None and card_value is not None:
+            cards_to_remove = list(filter(lambda target: target.value == card_value \
+                                     and target.suit == card_suit, self.cards))
+        elif card_suit is not None:
+            cards_to_remove = list(filter(lambda target: target.suit == card_suit, self.cards))
+        elif card_value is not None:
+            cards_to_remove = list(filter(lambda target: target.value == card_value, self.cards))
+
+        if len(cards_to_remove) > 0:
+            for card in cards_to_remove:
+                self.cards.remove(card)
 
     def total(self) -> int:
         """Total up card value in collection"""
