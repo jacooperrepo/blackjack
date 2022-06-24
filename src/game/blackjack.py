@@ -21,18 +21,18 @@ class Blackjack:
         self.dealer = Player()
         self.in_game_message = ''
         self.game_blackjack_odds_message = 'blackjack pays (3/2)'
-        self.rules_path = './src/game/rules/blackjack.txt'
 
         if display_rules:
             self.game_rules = self.get_rules()
         else:
             self.game_rules = ''
 
-    def get_rules(self) -> str:
+    @staticmethod
+    def get_rules() -> str:
         """Get the rules text for the game"""
         rules = ''
         try:
-            with open(self.rules_path, 'r') as f:
+            with open('./src/game/rules/blackjack.txt', 'r') as f:
                 rules = f.read()
         except IOError:
             pass
@@ -247,7 +247,7 @@ class Blackjack:
 
     def winner_outcome_and_messaging(self, player_total:
                                      int, dealer_total, split_hand:bool = False) -> str:
-        """Apply messaging to gaem for game outcome"""
+        """Apply messaging to game for game outcome"""
         split_hand_text = ''
         outcome = GameWinner.NOTSET
 
@@ -332,7 +332,18 @@ class FaceUp21(Blackjack):
         self.game_name = self.game_color + '-' * 16 + 'Face Up 21' + '-' * 15 + '\n' \
                          + Style.RESET_ALL
         self.game_blackjack_odds_message = 'blackjack pays even money'
-        self.rules_path = './src/game/rules/face_up_21.txt'
+
+    @staticmethod
+    def get_rules() -> str:
+        """Get the rules text for the game"""
+        rules = ''
+        try:
+            with open('./src/game/rules/face_up_21.txt', 'r') as f:
+                rules = f.read()
+        except IOError:
+            pass
+
+        return rules
 
     def double_down(self):
         """Double down initial bet"""
@@ -391,7 +402,18 @@ class Spanish21(Blackjack):
         self.game_name = self.game_color + '-' * 16 + 'Spanish 21' + '-' * 15 + '\n' \
                          + Style.RESET_ALL
         self.game_blackjack_odds_message = 'blackjack pays (3/2)'
-        self.rules_path = './src/game/rules/spanish_21.txt'
+
+    @staticmethod
+    def get_rules() -> str:
+        """Get the rules text for the game"""
+        rules = ''
+        try:
+            with open('./src/game/rules/spanish_21.txt', 'r') as f:
+                rules = f.read()
+        except IOError:
+            pass
+
+        return rules
 
     def remove_tens(self):
         """Spanish 21 does not have 10s"""
