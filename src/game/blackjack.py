@@ -21,18 +21,18 @@ class Blackjack:
         self.dealer = Player()
         self.in_game_message = ''
         self.game_blackjack_odds_message = 'blackjack pays (3/2)'
+        self.rules_path = './src/game/rules/blackjack.txt'
 
         if display_rules:
             self.game_rules = self.get_rules()
         else:
             self.game_rules = ''
 
-    @staticmethod
-    def get_rules() -> str:
+    def get_rules(self) -> str:
         """Get the rules text for the game"""
         rules = ''
         try:
-            with open('./src/game/rules/blackjack.txt', 'r') as f:
+            with open(self.rules_path, 'r') as f:
                 rules = f.read()
         except IOError:
             pass
@@ -109,6 +109,8 @@ class Blackjack:
         valid_entry = False
         valid_bet = 0
 
+        print(self)
+
         while not valid_entry:
             if self.player.wallet <= 0:
                 raise OutOfFundsException
@@ -154,14 +156,10 @@ class Blackjack:
     def process_input(self) -> str:
         """Process player input"""
         entry = ''
+        self.place_your_bets()
+        self.in_game_message = ''
 
         while entry.upper() != 'Q':
-            print(self)
-
-            if entry == '':
-                self.place_your_bets()
-                self.in_game_message = ''
-
             print(self)
 
             entry = input('{}H {}to hit {}S {}to stand {}F {}to fold\n'
@@ -334,18 +332,7 @@ class FaceUp21(Blackjack):
         self.game_name = self.game_color + '-' * 16 + 'Face Up 21' + '-' * 15 + '\n' \
                          + Style.RESET_ALL
         self.game_blackjack_odds_message = 'blackjack pays even money'
-
-    @staticmethod
-    def get_rules() -> str:
-        """Get the rules text for the game"""
-        rules = ''
-        try:
-            with open('./src/game/rules/face_up_21.txt', 'r') as f:
-                rules = f.read()
-        except IOError:
-            pass
-
-        return rules
+        self.rules_path = './src/game/rules/face_up_21.txt'
 
     def double_down(self):
         """Double down initial bet"""
@@ -389,35 +376,8 @@ class FaceUp21(Blackjack):
                 self.player.wallet += self.player.split_hand.bet
 
     def place_your_bets(self):
-        """Get bet input from user"""
-        valid_entry = False
-        valid_bet = 0
-
-        while not valid_entry:
-            if self.player.wallet <= 0:
-                raise OutOfFundsException
-
-            bet = input('Place your bet: ')
-
-            try:
-                valid_bet = int(bet)
-                valid_entry = True
-            except ValueError:
-                try:
-                    valid_bet = float(bet)
-                    valid_entry = True
-                except ValueError:
-                    pass
-
-        if self.player.wallet - valid_bet < 0 or valid_bet < 0:
-            self.place_your_bets()
-        else:
-            self.player.wallet -= valid_bet
-            self.player.hand.bet = valid_bet
-
-            self.dealer.hand.add(self.shoe.deal())
-            self.dealer.hand.add(self.shoe.deal())
-            self.player.hand.add(self.shoe.deal())
+        super().place_your_bets()
+        self.dealer.hand.add(self.shoe.deal())
 
 
 class Spanish21(Blackjack):
@@ -431,18 +391,7 @@ class Spanish21(Blackjack):
         self.game_name = self.game_color + '-' * 16 + 'Spanish 21' + '-' * 15 + '\n' \
                          + Style.RESET_ALL
         self.game_blackjack_odds_message = 'blackjack pays (3/2)'
-
-    @staticmethod
-    def get_rules() -> str:
-        """Get the rules text for the game"""
-        rules = ''
-        try:
-            with open('./src/game/rules/spanish_21.txt', 'r') as f:
-                rules = f.read()
-        except IOError:
-            pass
-
-        return rules
+        self.rules_path = './src/game/rules/spanish_21.txt'
 
     def remove_tens(self):
         """Spanish 21 does not have 10s"""

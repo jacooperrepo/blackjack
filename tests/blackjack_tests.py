@@ -327,4 +327,18 @@ def test_spanish_21_calculate_winnings():
     assert game.player.wallet == 15
 
 
+def test_spanish_21_player_blackjack_always_wins():
+    game = Spanish21(1, 0)
+    game.player.wallet = 0
 
+    game.player.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
+    game.player.hand.add(Card(CardValue.TEN, CardSuit.SPADES))
+
+    game.dealer.hand.add(Card(CardValue.ACE, CardSuit.SPADES))
+    game.dealer.hand.add(Card(CardValue.TEN, CardSuit.SPADES))
+
+    # Blackjack pays 3/2
+    game.player.hand.bet = 10
+    game.check_winner()
+
+    assert game.player.wallet == 15
