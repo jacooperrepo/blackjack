@@ -134,6 +134,7 @@ class Blackjack:
             self.player.hand.bet = valid_bet
             self.dealer.hand.add(self.shoe.deal())
             self.player.hand.add(self.shoe.deal())
+            self.player.hand.add(self.shoe.deal())
 
     def double_down(self):
         """Double down initial bet"""
