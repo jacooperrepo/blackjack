@@ -1,8 +1,8 @@
 import pytest
 from src.game.blackjack import Blackjack, Spanish21, FaceUp21
-from src.card.entities import Card
+from src.card.entities import Card, Diamonds, Spades, Hearts, Clubs
 from src.card.enums import CardSuit, CardValue
-from src.game.enums import PlayerHandStatus
+from src.game.enums import PlayerHandStatus, GameWinner
 from src.game.entities import Hand
 
 
@@ -46,23 +46,25 @@ def test_check_print(blackjack_game):
     assert output.index('remaining cards') > 0
 
 
-@pytest.mark.parametrize("card1, card2, card3, expected", [
-    (Card(CardValue.KING, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES), Card(CardValue.TWO, CardSuit.SPADES), 0),
-    (Card(CardValue.EIGHT, CardSuit.SPADES), Card(CardValue.TWO, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES), -1),
-    (Card(CardValue.ACE, CardSuit.SPADES), Card(CardValue.FIVE, CardSuit.SPADES), Card(CardValue.SIX, CardSuit.SPADES), 0),
-    (Card(CardValue.SEVEN, CardSuit.SPADES), Card(CardValue.THREE, CardSuit.SPADES), Card(CardValue.TEN, CardSuit.SPADES), -1),
-    (Card(CardValue.SIX, CardSuit.SPADES), Card(CardValue.TWO, CardSuit.SPADES), Card(CardValue.NINE, CardSuit.SPADES), -1)])
-def test_check_player_winner(blackjack_game, card1, card2, card3, expected):
+@pytest.mark.parametrize("card1, card2, card3, card4, expected", [
+    (Diamonds(CardValue.TEN), Clubs(CardValue.ACE), Spades(CardValue.KING), Hearts(CardValue.JACK), GameWinner.PLAYER),
+    (Diamonds(CardValue.TEN), Clubs(CardValue.QUEEN), Spades(CardValue.KING), Hearts(CardValue.JACK), GameWinner.DRAW),
+    (Diamonds(CardValue.TEN), Clubs(CardValue.THREE), Spades(CardValue.SEVEN), Hearts(CardValue.EIGHT), GameWinner.DEALER),
+    (Diamonds(CardValue.ACE), Clubs(CardValue.ACE), Spades(CardValue.NINE), Hearts(CardValue.TWO), GameWinner.PLAYER),
+    (Diamonds(CardValue.KING), Clubs(CardValue.ACE), Spades(CardValue.KING), Hearts(CardValue.QUEEN), GameWinner.PLAYER)])
+def test_check_player_winner(blackjack_game, card1, card2, card3, card4, expected):
     blackjack_game.player.hand.reset()
     blackjack_game.dealer.hand.reset()
 
     blackjack_game.player.hand.add(card1)
     blackjack_game.player.hand.add(card2)
     blackjack_game.dealer.hand.add(card3)
+    blackjack_game.dealer.hand.add(card4)
 
     blackjack_game.check_winner()
 
-    assert blackjack_game.in_game_message.find('Player wins') >= expected
+    assert blackjack_game.player.hand.outcome == expected
+    assert blackjack_game.dealer.hand.outcome == GameWinner.NOTSET
 
 
 @pytest.mark.parametrize("card1, card2, card3, expected", [
@@ -146,7 +148,6 @@ def test_faceup_21_double_down(card, status, expected):
     game.double_down()
 
     assert game.player.hand.bet == expected
-
 
 
 def test_faceup_21_calculate_winnings():

@@ -162,11 +162,9 @@ class Blackjack:
         while entry.upper() != 'Q':
             print(self)
 
-            entry = input('{}H {}to hit {}S {}to stand {}F {}to fold\n'
-                          '{}R {}to reset deck {}X {}to split {}D {}to double down\n{}Q {}to end '
+            entry = input('{}H {}to hit {}S {}to stand {}R {}to reset deck\n'
+                          '{}X {}to split {}D {}to double down\n{}Q {}to end '
                           .format(Fore.LIGHTBLUE_EX,
-                                  Fore.LIGHTBLACK_EX,
-                                  Fore.LIGHTBLUE_EX,
                                   Fore.LIGHTBLACK_EX,
                                   Fore.LIGHTBLUE_EX,
                                   Fore.LIGHTBLACK_EX,
@@ -200,9 +198,6 @@ class Blackjack:
                     self.player.status = PlayerHandStatus.SPLIT_IN_PLAY_HAND_TWO
                 elif self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_TWO:
                     self.player.status = PlayerHandStatus.SPLIT_ENDED
-            elif entry.upper() == 'F':  # Fold
-                self.in_game_message = Fore.BLUE + Style.BRIGHT + 'Dealer wins!' + Style.RESET_ALL
-                break
             elif entry.upper() == 'R':  # Reset deck
                 self.shoe.reset()
             elif entry.upper() == 'X':  # Split
