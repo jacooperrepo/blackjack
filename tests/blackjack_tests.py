@@ -132,16 +132,26 @@ def test_spanish_21_deck_creation():
     assert len(list(found_cards)) == 0
 
 
-@pytest.mark.parametrize("card, status, expected", [
-    (Card(CardValue.KING, CardSuit.SPADES), PlayerHandStatus.IN_PLAY, 20),
-    (Card(CardValue.ACE, CardSuit.SPADES), PlayerHandStatus.IN_PLAY, 20),
-    (Card(CardValue.TEN, CardSuit.SPADES), PlayerHandStatus.IN_PLAY, 20),
-    (Card(CardValue.NINE, CardSuit.SPADES), PlayerHandStatus.IN_PLAY, 20),
-    (Card(CardValue.EIGHT, CardSuit.SPADES), PlayerHandStatus.IN_PLAY, 10)])
-def test_faceup_21_double_down(card, status, expected):
+@pytest.mark.parametrize("card1, card2, status, expected", [
+    (Spades(CardValue.KING), Spades(CardValue.KING), PlayerHandStatus.IN_PLAY, 10),
+    (Spades(CardValue.KING), Spades(CardValue.QUEEN), PlayerHandStatus.IN_PLAY, 10),
+    (Hearts(CardValue.ACE), Spades(CardValue.ACE), PlayerHandStatus.IN_PLAY, 10),
+    (Clubs(CardValue.TEN), Spades(CardValue.TEN), PlayerHandStatus.IN_PLAY, 10),
+    (Clubs(CardValue.TEN), Spades(CardValue.NINE), PlayerHandStatus.IN_PLAY, 10),
+    (Diamonds(CardValue.NINE), Spades(CardValue.NINE), PlayerHandStatus.IN_PLAY, 10),
+    (Spades(CardValue.EIGHT), Spades(CardValue.EIGHT), PlayerHandStatus.IN_PLAY, 10),
+    (Spades(CardValue.SIX), Spades(CardValue.SIX), PlayerHandStatus.IN_PLAY, 10),
+    (Spades(CardValue.JACK), Spades(CardValue.TEN), PlayerHandStatus.IN_PLAY, 10),
+    (Spades(CardValue.FIVE), Spades(CardValue.FOUR), PlayerHandStatus.IN_PLAY, 20),
+    (Spades(CardValue.ACE), Spades(CardValue.TEN), PlayerHandStatus.IN_PLAY, 10),
+    (Spades(CardValue.FIVE), Spades(CardValue.FIVE), PlayerHandStatus.IN_PLAY, 20),
+    (Spades(CardValue.THREE), Spades(CardValue.NINE), PlayerHandStatus.IN_PLAY, 10),
+    (Spades(CardValue.FOUR), Spades(CardValue.FOUR), PlayerHandStatus.IN_PLAY, 10)])
+def test_faceup_21_double_down(card1, card2, status, expected):
     game = FaceUp21(1, 0)
 
-    game.player.hand.add(card)
+    game.player.hand.add(card1)
+    game.player.hand.add(card2)
     game.player.status = status
     game.player.hand.bet = 10
     game.player.wallet = 10
@@ -343,3 +353,11 @@ def test_spanish_21_player_blackjack_always_wins():
     game.check_winner()
 
     assert game.player.wallet == 15
+
+
+def add_cards(blackjack_game):
+    blackjack_game.player.hand.bet = 10
+    blackjack_game.dealer.hand.add(blackjack_game.shoe.deal())
+    blackjack_game.player.hand.add(blackjack_game.shoe.deal())
+    blackjack_game.player.hand.add(blackjack_game.shoe.deal())
+

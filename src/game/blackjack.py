@@ -138,21 +138,36 @@ class Blackjack:
 
     def double_down(self):
         """Double down initial bet"""
-        if self.player.status == PlayerHandStatus.IN_PLAY and len(self.player.hand.cards) == 1:
-            if self.player.wallet - self.player.hand.bet >= 0 and self.player.hand.double_down == False:
-                self.player.wallet -= self.player.hand.bet
-                self.player.hand.bet *= 2
-                self.player.hand.double_down = True
-        elif self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_ONE and len(self.player.hand.cards) == 1:
-            if self.player.wallet - self.player.hand.bet >= 0 and self.player.hand.double_down == False:
-                self.player.wallet -= self.player.hand.bet
-                self.player.hand.bet *= 2
-                self.player.hand.double_down = True
-        elif self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_TWO and len(self.player.split_hand.cards) == 1:
-            if self.player.wallet - self.player.split_hand.bet >= 0 and self.player.split_hand.double_down == False:
-                self.player.wallet -= self.player.split_hand.bet
-                self.player.split_hand.bet *= 2
-                self.player.split_hand.double_down = True
+        if len(self.player.hand.cards) == 2:
+            if self.player.status == PlayerHandStatus.IN_PLAY or \
+               self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_ONE:
+                if self.player.wallet - self.player.hand.bet >= 0 and self.player.hand.double_down == False:
+                    self.player.wallet -= self.player.hand.bet
+                    self.player.hand.bet *= 2
+                    self.player.hand.double_down = True
+            elif self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_TWO:
+                if self.player.wallet - self.player.split_hand.bet >= 0 and self.player.split_hand.double_down == False:
+                    self.player.wallet -= self.player.split_hand.bet
+                    self.player.split_hand.bet *= 2
+                    self.player.split_hand.double_down = True
+
+    @staticmethod
+    def get_user_selection() -> str:
+        return input('{}H {}to hit {}S {}to stand {}R {}to reset deck\n'
+                      '{}X {}to split {}D {}to double down\n{}Q {}to end '
+                      .format(Fore.LIGHTBLUE_EX,
+                              Fore.LIGHTBLACK_EX,
+                              Fore.LIGHTBLUE_EX,
+                              Fore.LIGHTBLACK_EX,
+                              Fore.LIGHTBLUE_EX,
+                              Fore.LIGHTBLACK_EX,
+                              Fore.LIGHTBLUE_EX,
+                              Fore.LIGHTBLACK_EX,
+                              Fore.LIGHTBLUE_EX,
+                              Fore.LIGHTBLACK_EX,
+                              Fore.LIGHTBLUE_EX,
+                              Fore.LIGHTBLACK_EX
+                              ))
 
     def process_input(self) -> str:
         """Process player input"""
@@ -163,21 +178,7 @@ class Blackjack:
         while entry.upper() != 'Q':
             print(self)
 
-            entry = input('{}H {}to hit {}S {}to stand {}R {}to reset deck\n'
-                          '{}X {}to split {}D {}to double down\n{}Q {}to end '
-                          .format(Fore.LIGHTBLUE_EX,
-                                  Fore.LIGHTBLACK_EX,
-                                  Fore.LIGHTBLUE_EX,
-                                  Fore.LIGHTBLACK_EX,
-                                  Fore.LIGHTBLUE_EX,
-                                  Fore.LIGHTBLACK_EX,
-                                  Fore.LIGHTBLUE_EX,
-                                  Fore.LIGHTBLACK_EX,
-                                  Fore.LIGHTBLUE_EX,
-                                  Fore.LIGHTBLACK_EX,
-                                  Fore.LIGHTBLUE_EX,
-                                  Fore.LIGHTBLACK_EX
-                                  ))
+            entry = self.get_user_selection()
 
             self.in_game_message = ''
 
@@ -343,24 +344,20 @@ class FaceUp21(Blackjack):
 
     def double_down(self):
         """Double down initial bet"""
-        if self.player.status == PlayerHandStatus.IN_PLAY and len(self.player.hand.cards) == 1:
-            if self.player.hand.cards[0].numerical_value() in (1, 9, 10) and self.player.hand.double_down == False:
-                if self.player.wallet - self.player.hand.bet >= 0:
-                    self.player.wallet -= self.player.hand.bet
-                    self.player.hand.bet *= 2
-                    self.player.hand.double_down = True
-        elif self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_ONE and len(self.player.hand.cards) == 1:
-            if self.player.hand.cards[0].numerical_value() in (1, 9, 10) and self.player.hand.double_down == False:
-                if self.player.wallet - self.player.hand.bet >= 0:
-                    self.player.wallet -= self.player.hand.bet
-                    self.player.hand.bet *= 2
-                    self.player.hand.double_down = True
-        elif self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_TWO and len(self.player.split_hand.cards) == 1:
-            if self.player.split_hand.cards[0].numerical_value() in (1, 9, 10) and self.player.split_hand.double_down == False:
-                if self.player.wallet - self.player.split_hand.bet >= 0:
-                    self.player.wallet -= self.player.split_hand.bet
-                    self.player.split_hand.bet *= 2
-                    self.player.split_hand.double_down = True
+        if len(self.player.hand.cards) == 2:
+            if self.player.status == PlayerHandStatus.IN_PLAY or \
+               self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_ONE:
+               if self.player.hand.total() in (9, 10, 11):
+                    if self.player.wallet - self.player.hand.bet >= 0 and self.player.hand.double_down == False:
+                        self.player.wallet -= self.player.hand.bet
+                        self.player.hand.bet *= 2
+                        self.player.hand.double_down = True
+            elif self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_TWO:
+                if self.player.split_hand.total() in (9, 10, 11):
+                    if self.player.wallet - self.player.split_hand.bet >= 0 and self.player.split_hand.double_down == False:
+                        self.player.wallet -= self.player.split_hand.bet
+                        self.player.split_hand.bet *= 2
+                        self.player.split_hand.double_down = True
 
     def calculate_winnings(self):
         """Calculate winnings for Player"""
