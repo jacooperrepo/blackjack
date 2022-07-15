@@ -239,6 +239,7 @@ class Shoe(CardCollection):
     def reset(self) -> None:
         """Regenerate the deck of blackjack"""
         self.cards = self.generate_shoe()
+        self.shuffle_cards()
         self.notifier.raise_event("reset")
 
     def generate_shoe(self) -> []:
