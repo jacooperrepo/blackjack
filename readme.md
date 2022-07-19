@@ -26,7 +26,7 @@ _Rules_
 Rules
 1. In this version of the game, both of the dealer’s cards are dealt and shown face up.
 2. Dealer hits on soft 17, and dealer blackjack beats a player blackjack, and blackjack only pays even money.
-3. Players can only double down on 9, 10, and 11.
+3. Players can only double down on hard total of 9, 10, and 11
 
 ### Spanish21
 

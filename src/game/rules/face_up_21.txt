@@ -2,5 +2,5 @@ Rules
 1. In this version of the game, both of the dealer’s cards are dealt and shown face up
 2. Blackjack pays even money
 3. Dealer blackjack beats player blackjack
-3. Dealer hits on soft 17
-3. Players can only double down on hard total of 9, 10, and 11
+4. Dealer hits on soft 17
+5. Players can only double down on hard total of 9, 10, and 11
