@@ -3,7 +3,7 @@
 from colorama import Fore, Style
 
 from src.card.entities import Shoe, Diamonds, Clubs, Spades, Hearts, CardValue
-from src.game.entities import BlackJackPlayer, Player
+from src.game.entities import BlackJackPlayer, BlackJackDealer
 from src.game.enums import GameWinner, PlayerHandStatus
 from src.exceptions.game import OutOfFundsException
 
@@ -14,11 +14,9 @@ class Blackjack:
         self.game_color = Fore.GREEN + Style.BRIGHT
         self.game_name = self.game_color + '-'*16 + 'Blackjack' + '-'*16 + '\n' \
                   + Style.RESET_ALL
-        self.shoe_size = shoe_size
         self.shoe = Shoe(shoe_size)
-        self.player = BlackJackPlayer()
-        self.player.wallet = wallet_amount
-        self.dealer = Player()
+        self.player = BlackJackPlayer(wallet_amount=wallet_amount)
+        self.dealer = BlackJackDealer()
         self.in_game_message = ''
         self.game_blackjack_odds_message = 'blackjack pays (3/2)'
 
@@ -54,7 +52,7 @@ class Blackjack:
         else:
             output += '  '
         output += Fore.LIGHTBLACK_EX + 'Dealer ' + Style.RESET_ALL
-        output += ' '.join(str(card) for card in self.dealer.hand.cards)
+        output += str(self.dealer)
         output += "\n"
         if not self.player.status in(PlayerHandStatus.ENDED, PlayerHandStatus.SPLIT_ENDED):
             output += Fore.BLACK + Style.BRIGHT + '* '
@@ -67,13 +65,13 @@ class Blackjack:
                                   PlayerHandStatus.SPLIT_ENDED):
             if self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_ONE:
                 output += Fore.BLACK + Style.BRIGHT + "." + Style.RESET_ALL
-            output += ' '.join(str(card) for card in self.player.hand.cards)
+            output += str(self.player.hand)
             output += '|'
             if self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_TWO:
                 output += Fore.BLACK + Style.BRIGHT + "." + Style.RESET_ALL
-            output += ' '.join(str(card) for card in self.player.split_hand.cards)
+            output += str(self.player.split_hand)
         else:
-            output += ' '.join(str(card) for card in self.player.hand.cards)
+            output += str(self.player.hand)
 
         output += self.game_color + '\n' + '-'*41 + '\n' + Style.RESET_ALL
         output += Fore.LIGHTBLUE_EX + Style.NORMAL + self.game_blackjack_odds_message + '\n' + Style.RESET_ALL
@@ -85,10 +83,8 @@ class Blackjack:
 
     def reset(self) -> None:
         """Reset game and hands"""
-        self.dealer.hand.reset()
-        self.player.hand.reset()
-        self.player.split_hand.reset()
-        self.player.status = PlayerHandStatus.IN_PLAY
+        self.dealer.reset()
+        self.player.reset()
 
     def play(self) -> None:
         """Game logic to run the game"""
@@ -98,6 +94,9 @@ class Blackjack:
             while keep_playing != 'Q':
                 keep_playing = self.process_input()
                 print(self)
+                if keep_playing != 'Q':
+                    input('Press any key to continue')
+
                 self.reset()
         except IndexError:
             print(Fore.RED + Style.BRIGHT + 'Out of cards' + Style.RESET_ALL)
@@ -130,11 +129,13 @@ class Blackjack:
         if self.player.wallet - valid_bet < 0 or valid_bet < 0:
             self.place_your_bets()
         else:
+            self.player.hand.add(self.shoe.deal())
+            self.player.hand.add(self.shoe.deal())
             self.player.wallet -= valid_bet
             self.player.hand.bet = valid_bet
+
             self.dealer.hand.add(self.shoe.deal())
-            self.player.hand.add(self.shoe.deal())
-            self.player.hand.add(self.shoe.deal())
+            self.dealer.hand.add(self.shoe.deal())
 
     def double_down(self):
         """Double down initial bet"""
@@ -196,10 +197,12 @@ class Blackjack:
                     break
                 elif self.player.status == PlayerHandStatus.IN_PLAY:
                     self.player.status = PlayerHandStatus.ENDED
+                    self.dealer.hand_visible = True
                 elif self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_ONE:
                     self.player.status = PlayerHandStatus.SPLIT_IN_PLAY_HAND_TWO
                 elif self.player.status == PlayerHandStatus.SPLIT_IN_PLAY_HAND_TWO:
                     self.player.status = PlayerHandStatus.SPLIT_ENDED
+                    self.dealer.hand_visible = True
             elif entry.upper() == 'R':  # Reset deck
                 self.shoe.reset()
             elif entry.upper() == 'X':  # Split
@@ -236,7 +239,10 @@ class Blackjack:
             if self.player.split_hand.bust():
                 self.player.status = PlayerHandStatus.SPLIT_ENDED
         else:
-            self.dealer.hand.add(self.shoe.deal())
+            if self.dealer.hand_visible:
+                self.dealer.hand.add(self.shoe.deal())
+            else:
+                self.dealer.hand_visible = True
             if self.dealer.hand.bust():
                 success = False
 
@@ -329,6 +335,7 @@ class FaceUp21(Blackjack):
         self.game_name = self.game_color + '-' * 16 + 'Face Up 21' + '-' * 15 + '\n' \
                          + Style.RESET_ALL
         self.game_blackjack_odds_message = 'blackjack pays even money'
+        self.dealer.hand_visible = True
 
     @staticmethod
     def get_rules() -> str:
@@ -379,9 +386,9 @@ class FaceUp21(Blackjack):
             else:
                 self.player.wallet += self.player.split_hand.bet
 
-    def place_your_bets(self):
-        super().place_your_bets()
-        self.dealer.hand.add(self.shoe.deal())
+    def reset(self) -> None:
+        super().reset()
+        self.dealer.hand_visible = True
 
 
 class Spanish21(Blackjack):

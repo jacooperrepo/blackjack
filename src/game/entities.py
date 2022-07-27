@@ -9,8 +9,11 @@ class Hand(CardCollection):
     def __init__(self):
         super().__init__([])
         self.bet:float = 0
-        self.double_down = False
+        self.double_down:bool = False
         self.outcome = GameWinner.NOTSET
+
+    def __str__(self):
+        return ' '.join(str(card) for card in self.cards)
 
     def blackjack(self) -> bool:
         """Return True or False if the hand is blackjack"""
@@ -58,7 +61,6 @@ class Hand(CardCollection):
         super().reset()
         self.bet = 0
         self.double_down = False
-        self.outcome = GameWinner.NOTSET
 
 
 class Player:
@@ -66,12 +68,43 @@ class Player:
     def __init__(self):
         self.hand = Hand()
 
+    def reset(self) -> None:
+        self.hand.reset()
+
+    def __str__(self):
+        return ' '.join(str(card) for card in self.hand.cards)
+
 
 class BlackJackPlayer(Player):
     """Blackjack player"""
     def __init__(self, wallet_amount:float = 0):
         super().__init__()
+
         self.split_hand = Hand()
         self.status = PlayerHandStatus.IN_PLAY
         self.wallet: float = wallet_amount
 
+    def reset(self) -> None:
+        super().reset()
+        self.split_hand.reset()
+        self.status = PlayerHandStatus.IN_PLAY
+
+
+class BlackJackDealer(Player):
+    """Blackjack player"""
+    def __init__(self):
+        super().__init__()
+
+        self.hand_visible = False
+
+    def __str__(self):
+        if self.hand_visible:
+            return super().__str__()
+        elif len(self.hand.cards) == 2:
+            return str(self.hand.cards[0]) + ' ##'
+        else:
+            return ''
+
+    def reset(self) -> None:
+        super().reset()
+        self.hand_visible = False

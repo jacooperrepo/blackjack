@@ -12,11 +12,16 @@ def blackjack_game():
 
 
 @pytest.mark.parametrize("card1, card2, card3, expected", [
-    (Card(CardValue.KING, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES), Card(CardValue.TWO, CardSuit.SPADES), False),
-    (Card(CardValue.JACK, CardSuit.SPADES), Card(CardValue.TEN, CardSuit.SPADES), Card(CardValue.TWO, CardSuit.SPADES), True),
-    (Card(CardValue.ACE, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES), False),
-    (Card(CardValue.SEVEN, CardSuit.SPADES), Card(CardValue.EIGHT, CardSuit.SPADES), Card(CardValue.SEVEN, CardSuit.SPADES), True),
-    (Card(CardValue.SIX, CardSuit.SPADES), Card(CardValue.SEVEN, CardSuit.SPADES), Card(CardValue.EIGHT, CardSuit.SPADES), False)])
+    (Card(CardValue.KING, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES), Card(CardValue.TWO, CardSuit.SPADES),
+     False),
+    (Card(CardValue.JACK, CardSuit.SPADES), Card(CardValue.TEN, CardSuit.SPADES), Card(CardValue.TWO, CardSuit.SPADES),
+     True),
+    (Card(CardValue.ACE, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES),
+     False),
+    (Card(CardValue.SEVEN, CardSuit.SPADES), Card(CardValue.EIGHT, CardSuit.SPADES),
+     Card(CardValue.SEVEN, CardSuit.SPADES), True),
+    (Card(CardValue.SIX, CardSuit.SPADES), Card(CardValue.SEVEN, CardSuit.SPADES),
+     Card(CardValue.EIGHT, CardSuit.SPADES), False)])
 def test_check_bust(blackjack_game, card1, card2, card3, expected):
     blackjack_game.player.hand.reset()
     blackjack_game.player.hand.add(card1)
@@ -49,9 +54,11 @@ def test_check_print(blackjack_game):
 @pytest.mark.parametrize("card1, card2, card3, card4, expected", [
     (Diamonds(CardValue.TEN), Clubs(CardValue.ACE), Spades(CardValue.KING), Hearts(CardValue.JACK), GameWinner.PLAYER),
     (Diamonds(CardValue.TEN), Clubs(CardValue.QUEEN), Spades(CardValue.KING), Hearts(CardValue.JACK), GameWinner.DRAW),
-    (Diamonds(CardValue.TEN), Clubs(CardValue.THREE), Spades(CardValue.SEVEN), Hearts(CardValue.EIGHT), GameWinner.DEALER),
+    (Diamonds(CardValue.TEN), Clubs(CardValue.THREE), Spades(CardValue.SEVEN), Hearts(CardValue.EIGHT),
+     GameWinner.DEALER),
     (Diamonds(CardValue.ACE), Clubs(CardValue.ACE), Spades(CardValue.NINE), Hearts(CardValue.TWO), GameWinner.PLAYER),
-    (Diamonds(CardValue.KING), Clubs(CardValue.ACE), Spades(CardValue.KING), Hearts(CardValue.QUEEN), GameWinner.PLAYER)])
+    (Diamonds(CardValue.KING), Clubs(CardValue.ACE), Spades(CardValue.KING), Hearts(CardValue.QUEEN),
+     GameWinner.PLAYER)])
 def test_check_player_winner(blackjack_game, card1, card2, card3, card4, expected):
     blackjack_game.player.hand.reset()
     blackjack_game.dealer.hand.reset()
@@ -64,15 +71,21 @@ def test_check_player_winner(blackjack_game, card1, card2, card3, card4, expecte
     blackjack_game.check_winner()
 
     assert blackjack_game.player.hand.outcome == expected
-    assert blackjack_game.dealer.hand.outcome == GameWinner.NOTSET
 
 
 @pytest.mark.parametrize("card1, card2, card3, expected", [
-    (Card(CardValue.KING, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES), 12),
-    (Card(CardValue.ACE, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES), 13),
-    (Card(CardValue.JACK, CardSuit.SPADES), Card(CardValue.QUEEN, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES), 21),
-    (Card(CardValue.KING, CardSuit.SPADES), Card(CardValue.THREE, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES), 14),
-    (Card(CardValue.SIX, CardSuit.SPADES), Card(CardValue.TWO, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES), 19)])
+    (Card(CardValue.KING, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES),
+     12),
+    (Card(CardValue.ACE, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES),
+     13),
+    (
+    Card(CardValue.JACK, CardSuit.SPADES), Card(CardValue.QUEEN, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES),
+    21),
+    (
+    Card(CardValue.KING, CardSuit.SPADES), Card(CardValue.THREE, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES),
+    14),
+    (Card(CardValue.SIX, CardSuit.SPADES), Card(CardValue.TWO, CardSuit.SPADES), Card(CardValue.ACE, CardSuit.SPADES),
+     19)])
 def test_total_hand(blackjack_game, card1, card2, card3, expected):
     blackjack_game.player.hand.add(card1)
     blackjack_game.player.hand.add(card2)
@@ -97,10 +110,17 @@ def test_hit(blackjack_game):
     assert len(blackjack_game.player.split_hand.cards) == 1
 
     blackjack_game.player.status = PlayerHandStatus.ENDED
+    blackjack_game.dealer.hand_visible = True
+
     blackjack_game.hit()
-    assert len(blackjack_game.player.hand.cards) == 2
-    assert len(blackjack_game.player.split_hand.cards) == 1
     assert len(blackjack_game.dealer.hand.cards) == 1
+
+    blackjack_game.player.status = PlayerHandStatus.ENDED
+    blackjack_game.dealer.hand_visible = False
+
+    blackjack_game.hit()
+    assert len(blackjack_game.dealer.hand.cards) == 1
+    assert blackjack_game.dealer.hand_visible
 
 
 @pytest.mark.parametrize("card1, card2, expected", [
@@ -360,4 +380,3 @@ def add_cards(blackjack_game):
     blackjack_game.dealer.hand.add(blackjack_game.shoe.deal())
     blackjack_game.player.hand.add(blackjack_game.shoe.deal())
     blackjack_game.player.hand.add(blackjack_game.shoe.deal())
-
