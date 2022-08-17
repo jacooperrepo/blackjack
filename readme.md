@@ -1,4 +1,4 @@
-# Blackjack Game Collection
+# Blackjack Console Game Collection
 
 ### **BlackjackGameCollection**
 
